@@ -7,12 +7,12 @@ import { GameStorage } from './game.storage';
 export class GameInmemoryStorage extends GameStorage {
   private games = new Map<UUID, Game>();
 
-  save(game: Game): Promise<void> {
+  async save(game: Game): Promise<void> {
     this.games.set(game.id, game);
     return Promise.resolve();
   }
 
-  findById(id: UUID): Promise<Game | null> {
+  async findById(id: UUID): Promise<Game | null> {
     return Promise.resolve(this.games.get(id) ?? null);
   }
 

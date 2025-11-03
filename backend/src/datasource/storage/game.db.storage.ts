@@ -5,11 +5,11 @@ import { UUID } from 'crypto';
 
 @Injectable()
 export class GameDbStorage extends GameStorage {
-  save(game: Game): Promise<void> {
+  async save(game: Game): Promise<void> {
     throw new Error('DB storage not implemented yet');
   }
 
-  findById(id: UUID): Game | undefined {
+  async findById(id: UUID): Promise<Game | null> {
     throw new Error('DB storage not implemented yet');
   }
 
