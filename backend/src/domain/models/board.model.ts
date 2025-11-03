@@ -1,5 +1,7 @@
 import type { ObjectValues } from 'src/common/types';
 
+export const BOARD_SIZE = 3;
+
 export const CELL = {
   EMPTY: 0,
   PLAYER: 1,
@@ -8,10 +10,9 @@ export const CELL = {
 
 export type CellValue = ObjectValues<typeof CELL>;
 
-export type Board = CellValue[][];
+export interface MoveCoordinates {
+  row: number;
+  col: number;
+}
 
-// export const createEmptyBoard = (): Board => [
-//   [CellValue.EMPTY, CellValue.EMPTY, CellValue.EMPTY],
-//   [CellValue.EMPTY, CellValue.EMPTY, CellValue.EMPTY],
-//   [CellValue.EMPTY, CellValue.EMPTY, CellValue.EMPTY],
-// ];
+export type Board = CellValue[][];
