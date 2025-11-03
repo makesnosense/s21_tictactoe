@@ -1,0 +1,23 @@
+meta {
+  name: make-move
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/game/550e8400-e29b-41d4-a716-446655440000
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {"id": "550e8400-e29b-41d4-a716-446655440000",
+  "board": [[0,0,0],[0,1,0],[0,0,0]],
+  "isGameOver": false,
+  "winner": null}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
