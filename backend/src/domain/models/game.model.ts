@@ -6,8 +6,8 @@ import type { ObjectValues } from 'src/common/types';
 export const GAME_RESULT = {
   IN_PROGRESS: null,
   DRAW: 'draw',
-  PLAYER_WIN: CELL.PLAYER,
-  AI_WIN: CELL.AI,
+  PLAYER_WIN: 'player wins',
+  COMPUTER_WIN: 'computer wins',
 } as const;
 
 export type GameResult = ObjectValues<typeof GAME_RESULT>;
@@ -23,8 +23,8 @@ export const cellValueToGameResult = (cellValue: CellValue): GameResult => {
   switch (cellValue) {
     case CELL.PLAYER:
       return GAME_RESULT.PLAYER_WIN;
-    case CELL.AI:
-      return GAME_RESULT.AI_WIN;
+    case CELL.COMPUTER:
+      return GAME_RESULT.COMPUTER_WIN;
     default:
       throw new Error(`Cannot convert cell value ${cellValue} to game result`);
   }

@@ -20,7 +20,7 @@ export class GameService extends GameServiceBase {
     super();
   }
 
-  calculateNextMove(game: Game): MoveCoordinates {
+  calculateNextComputerMove(game: Game): MoveCoordinates {
     const emptyCells = this.getEmptyCells(game.board);
 
     if (emptyCells.length === 0) {
@@ -50,7 +50,7 @@ export class GameService extends GameServiceBase {
     if (!previousGame) {
       // new game - board should be empty or have exactly one player move
       const playerMoves = this.countCells(game.board, CELL.PLAYER);
-      const aiMoves = this.countCells(game.board, CELL.AI);
+      const aiMoves = this.countCells(game.board, CELL.COMPUTER);
       return playerMoves === 1 && aiMoves === 0;
     }
 
@@ -69,7 +69,7 @@ export class GameService extends GameServiceBase {
           if (oldCell === CELL.EMPTY && newCell === CELL.PLAYER) {
             validPlayerMove = true;
           } else {
-            // invalid change (changed existing move or added AI move)
+            // invalid change (changed existing move or added COMPUTER move)
             return false;
           }
         }
