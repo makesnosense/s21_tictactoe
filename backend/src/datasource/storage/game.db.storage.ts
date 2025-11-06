@@ -13,11 +13,11 @@ export class GameDbStorage extends GameStorage {
     throw new Error('DB storage not implemented yet');
   }
 
-  deleteById(id: UUID): boolean {
+  deleteById(id: UUID): Promise<boolean> {
     throw new Error('DB storage not implemented yet');
   }
 
-  getAll(): Game[] {
+  getAll(): Promise<Game[]> {
     throw new Error('DB storage not implemented yet');
   }
 

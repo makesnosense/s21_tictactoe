@@ -16,15 +16,15 @@ export class GameInmemoryStorage extends GameStorage {
     return Promise.resolve(this.games.get(id) ?? null);
   }
 
-  deleteById(id: UUID): boolean {
-    return this.games.delete(id);
+  async deleteById(id: UUID): Promise<boolean> {
+    return Promise.resolve(this.games.delete(id));
   }
 
-  getAll(): Game[] {
-    return Array.from(this.games.values());
+  async getAll(): Promise<Game[]> {
+    return Promise.resolve(Array.from(this.games.values()));
   }
 
-  clear(): void {
-    this.games.clear();
-  }
+  // clear(): void {
+  //   this.games.clear();
+  // }
 }

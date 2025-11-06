@@ -5,6 +5,8 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Get,
+  Delete,
 } from '@nestjs/common';
 
 import { GameServiceBase } from 'src/domain/services/game.service.interface';
@@ -15,7 +17,7 @@ import { CELL } from 'src/domain/models/board.model';
 import type { GameDto } from '../models/game.dto';
 import { UUID } from 'crypto';
 
-@Controller('game')
+@Controller('games')
 export class GameController {
   constructor(
     private readonly gameService: GameServiceBase,
@@ -58,5 +60,19 @@ export class GameController {
     await this.gameRepository.save(game);
 
     return GameMapper.toDto(game);
+  }
+
+  @Delete(':id')
+  async deleteGame(@Param('id') id: UUID): Promise<boolean> {
+    return await this.gameRepository.deleteById(id);
+  }
+
+  @Get()
+  async getGames(): Promise<GameDto[]> {
+    const games = await this.gameRepository.getAll();
+
+    if (!games) return [];
+
+    return games.map((game) => GameMapper.toDto(game));
   }
 }
