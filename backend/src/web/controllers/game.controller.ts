@@ -15,7 +15,7 @@ import { GameMapper } from '../mappers/game.mapper';
 import { CELL } from 'src/domain/models/board.model';
 
 import type { GameDto } from '../models/game.dto';
-import { UUID } from 'crypto';
+import type { UUID } from 'crypto';
 
 @Controller('games')
 export class GameController {

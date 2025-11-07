@@ -1,16 +1,9 @@
 import { UUID } from 'crypto';
-import { Board, CELL } from './board.model';
-import type { CellValue } from './board.model';
-import type { ObjectValues } from 'src/common/types';
+import { CELL } from './board.model';
+import type { Board, CellValue } from './board.model';
+import { GAME_RESULT, type GameResult } from '../../../../shared/types/game';
 
-export const GAME_RESULT = {
-  IN_PROGRESS: null,
-  DRAW: 'draw',
-  PLAYER_WIN: 'player wins',
-  COMPUTER_WIN: 'computer wins',
-} as const;
-
-export type GameResult = ObjectValues<typeof GAME_RESULT>;
+export { GAME_RESULT, type GameResult };
 
 export interface Game {
   id: UUID;
