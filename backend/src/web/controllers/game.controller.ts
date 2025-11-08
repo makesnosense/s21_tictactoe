@@ -88,7 +88,6 @@ export class GameController {
       this.eventSubject.next({
         data: { type: 'game:updated', gameId: game.id },
       });
-
       return GameMapper.toDto(game);
     }
 
@@ -103,6 +102,9 @@ export class GameController {
     // save updated game state
     await this.gameRepository.save(game);
 
+    this.eventSubject.next({
+      data: { type: 'game:updated', gameId: game.id },
+    });
     return GameMapper.toDto(game);
   }
 

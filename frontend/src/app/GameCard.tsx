@@ -1,6 +1,8 @@
 "use client";
 import { Cell } from "./Cell";
 import type { Game } from "../../../shared/types/game";
+import { makeMove } from "@/lib/api";
+import { CELL } from "../../../shared/types/board";
 
 export function GameCard({ game }: { game: Game }) {
   const handleCellClick = (idx: number) => {
@@ -9,8 +11,10 @@ export function GameCard({ game }: { game: Game }) {
 
     console.log(`Game ${game.id}, cell [${row}][${col}] clicked`);
 
-    // later: make API call
-    // POST /api/games/${game.id} with updated board
+    const gameWithMove = structuredClone(game);
+    gameWithMove.board[row][col] = CELL.PLAYER;
+
+    makeMove(gameWithMove);
   };
 
   const board = game.board.flat();
