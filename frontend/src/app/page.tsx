@@ -1,14 +1,8 @@
-import { Game } from "../../../shared/types/game";
-import { GameCard } from "./GameCard";
+import { fetchGames } from "@/lib/api";
+import { GamesClient } from "./GamesClient";
 
 export default async function HomePage() {
-  const response = await fetch("http://localhost:3000/api/games");
-  const games = await response.json();
-  return (
-    <div className="flex gap-3">
-      {games.map((game: Game) => (
-        <GameCard key={game.id} game={game} />
-      ))}
-    </div>
-  );
+  const initialGames = await fetchGames();
+
+  return <GamesClient initialGames={initialGames} />;
 }
