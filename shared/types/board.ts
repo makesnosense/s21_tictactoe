@@ -16,3 +16,11 @@ export interface MoveCoordinates {
 }
 
 export type Board = CellValue[][];
+
+export function createEmptyBoard(): Board {
+  return [
+    [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+    [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+    [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+  ];
+}

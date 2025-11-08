@@ -1,4 +1,8 @@
-export { CELL, BOARD_SIZE } from '../../../../shared/types/board';
+export {
+  CELL,
+  BOARD_SIZE,
+  createEmptyBoard,
+} from '../../../../shared/types/board';
 export type {
   Board,
   CellValue,

@@ -9,13 +9,17 @@ import {
   Delete,
 } from '@nestjs/common';
 
+import { randomUUID } from 'crypto';
 import { GameServiceBase } from 'src/domain/services/game.service.interface';
 import { GameRepository } from 'src/datasource/repositories/game.repository';
 import { GameMapper } from '../mappers/game.mapper';
 import { CELL } from 'src/domain/models/board.model';
 
+import { createEmptyBoard } from '../../../../shared/types/board';
+
 import type { GameDto } from '../models/game.dto';
 import type { UUID } from 'crypto';
+import { Game } from 'src/domain/models/game.model';
 
 @Controller('games')
 export class GameController {
@@ -23,6 +27,20 @@ export class GameController {
     private readonly gameService: GameServiceBase,
     private readonly gameRepository: GameRepository,
   ) {}
+
+  @Post()
+  async createNewGame(): Promise<GameDto> {
+    const newGame: Game = {
+      id: randomUUID(),
+      board: createEmptyBoard(),
+      isGameOver: false,
+      winner: null,
+    };
+
+    await this.gameRepository.save(newGame);
+
+    return GameMapper.toDto(newGame);
+  }
 
   @Post(':id')
   async makeMove(
