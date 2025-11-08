@@ -7,8 +7,11 @@ import {
   HttpStatus,
   Get,
   Delete,
+  MessageEvent,
+  Sse,
 } from '@nestjs/common';
 
+import { Observable, Subject } from 'rxjs';
 import { randomUUID } from 'crypto';
 import { GameServiceBase } from 'src/domain/services/game.service.interface';
 import { GameRepository } from 'src/datasource/repositories/game.repository';
@@ -21,12 +24,26 @@ import type { GameDto } from '../models/game.dto';
 import type { UUID } from 'crypto';
 import { Game } from 'src/domain/models/game.model';
 
+interface GameUpdateEvent {
+  data: {
+    type: 'game:updated' | 'game:created' | 'game:deleted';
+    gameId?: string;
+  };
+}
+
 @Controller('games')
 export class GameController {
+  private eventSubject = new Subject<GameUpdateEvent>();
+
   constructor(
     private readonly gameService: GameServiceBase,
     private readonly gameRepository: GameRepository,
   ) {}
+
+  @Sse('events')
+  streamEvents(): Observable<GameUpdateEvent> {
+    return this.eventSubject.asObservable();
+  }
 
   @Post()
   async createNewGame(): Promise<GameDto> {
@@ -38,6 +55,10 @@ export class GameController {
     };
 
     await this.gameRepository.save(newGame);
+
+    this.eventSubject.next({
+      data: { type: 'game:created', gameId: newGame.id },
+    });
 
     return GameMapper.toDto(newGame);
   }
@@ -63,6 +84,11 @@ export class GameController {
       game.isGameOver = true;
       game.winner = gameStatus.winner;
       await this.gameRepository.save(game);
+
+      this.eventSubject.next({
+        data: { type: 'game:updated', gameId: game.id },
+      });
+
       return GameMapper.toDto(game);
     }
 
@@ -82,7 +108,13 @@ export class GameController {
 
   @Delete(':id')
   async deleteGame(@Param('id') id: UUID): Promise<boolean> {
-    return await this.gameRepository.deleteById(id);
+    const result = await this.gameRepository.deleteById(id);
+    if (result) {
+      this.eventSubject.next({
+        data: { type: 'game:deleted', gameId: id },
+      });
+    }
+    return result;
   }
 
   @Get()
