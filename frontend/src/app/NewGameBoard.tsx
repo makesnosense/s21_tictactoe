@@ -10,13 +10,13 @@ export function NewGameBoard({ onClick }: NewGameBoardProps) {
   return (
     <button
       onClick={onClick}
-      className="group relative h-[calc(3*2.5rem+2*1px)] w-[calc(3*2.5rem+2*1px)] rounded border border-dashed border-zinc-100 transition-all hover:border-zinc-200 dark:border-zinc-700/50 dark:hover:border-zinc-700"
+      className="group relative h-[calc(3*2.5rem+2*1px)] w-[calc(3*2.5rem+2*1px)] rounded border border-dashed border-zinc-100 transition-all hover:border-zinc-200 dark:border-zinc-800/50 dark:hover:border-zinc-800"
     >
-      <div className="absolute inset-0 grid grid-cols-3 gap-px bg-zinc-300/0 transition-all group-hover:bg-zinc-200/50 dark:bg-zinc-700/0 dark:group-hover:bg-zinc-700/50">
+      <div className="absolute inset-0 grid grid-cols-3 gap-px bg-zinc-300/0 transition-all group-hover:bg-zinc-200/50 dark:bg-zinc-700/0 dark:group-hover:bg-zinc-800/50">
         {[...Array(BOARD_SIZE * BOARD_SIZE)].map((_, index) => (
           <span
             key={index}
-            className="bg-white/0 transition-all group-hover:bg-white dark:bg-zinc-950/0 dark:group-hover:bg-zinc-950"
+            className="bg-white/0 transition-all duration-300 ease-out group-hover:bg-white dark:bg-zinc-950/0 dark:group-hover:bg-zinc-950"
           />
         ))}
       </div>
