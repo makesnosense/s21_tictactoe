@@ -3,7 +3,7 @@ import type { CellValue } from "../../../shared/types/board";
 
 function getCellIcon(cell: CellValue) {
   if (cell === 1) return <X className="h-8 w-8" />;
-  if (cell === 2) return <Circle className="h-8 w-8" />;
+  if (cell === 2) return <Circle className="aspect-square h-[22px]" />;
   return null;
 }
 
