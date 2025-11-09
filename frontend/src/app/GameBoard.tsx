@@ -4,7 +4,7 @@ import type { Game } from "../../../shared/types/game";
 import { makeMove } from "@/lib/api";
 import { CELL } from "../../../shared/types/board";
 
-export function GameCard({ game }: { game: Game }) {
+export function GameBoard({ game }: { game: Game }) {
   const handleCellClick = (idx: number) => {
     const row = Math.floor(idx / 3);
     const col = idx % 3;

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Game } from "../../../shared/types/game";
-import { GameCard } from "./GameCard";
+import { GameBoard } from "./GameBoard";
 import { fetchGames, createNewGame } from "@/lib/api";
+import { NewGameBoard } from "./NewGameBoard";
 
 interface GamesClientProps {
   initialGames: Game[];
@@ -39,17 +40,12 @@ export function GamesClient({ initialGames }: GamesClientProps) {
 
   return (
     <div>
-      <button
-        onClick={handleNewGame}
-        className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-      >
-        New Game
-      </button>
-
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-8 p-6">
         {games.map((game: Game) => (
-          <GameCard key={game.id} game={game} />
+          <GameBoard key={game.id} game={game} />
         ))}
+
+        <NewGameBoard onClick={handleNewGame} />
       </div>
     </div>
   );
