@@ -10,8 +10,10 @@ export const GAME_RESULT = {
 export type GameResult = ObjectValues<typeof GAME_RESULT>;
 
 export interface Game {
-  id: string;
+  slot: number;
   board: Board;
   isGameOver: boolean;
   winner: GameResult;
 }
+
+export const MAX_SLOTS = 24;

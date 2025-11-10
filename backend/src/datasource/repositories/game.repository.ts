@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GameStorage } from 'src/datasource/storage/game.storage';
 import { Game } from 'src/datasource/models/game.model';
-import { UUID } from 'crypto';
 
 @Injectable()
 export class GameRepository {
@@ -11,12 +10,12 @@ export class GameRepository {
     return this.storage.save(game);
   }
 
-  async findById(id: UUID): Promise<Game | null> {
-    return this.storage.findById(id);
+  async findBySlot(slot: number): Promise<Game | null> {
+    return this.storage.findBySlot(slot);
   }
 
-  async deleteById(id: UUID): Promise<boolean> {
-    return this.storage.deleteById(id);
+  async deleteBySlot(slot: number): Promise<boolean> {
+    return this.storage.deleteBySlot(slot);
   }
 
   async getAll(): Promise<Game[] | null> {

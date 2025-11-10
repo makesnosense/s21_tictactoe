@@ -1,27 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { UUID } from 'crypto';
 import { Game } from 'src/datasource/models/game.model';
 import { GameStorage } from './game.storage';
 
 @Injectable()
 export class GameInmemoryStorage extends GameStorage {
-  private games = new Map<UUID, Game>();
+  private games = new Map<number, Game>();
 
   async save(game: Game): Promise<void> {
-    this.games.set(game.id, game);
+    this.games.set(game.slot, game);
     return Promise.resolve();
   }
 
-  async findById(id: UUID): Promise<Game | null> {
-    return Promise.resolve(this.games.get(id) ?? null);
+  async findBySlot(slot: number): Promise<Game | null> {
+    return Promise.resolve(this.games.get(slot) ?? null);
   }
 
-  async deleteById(id: UUID): Promise<boolean> {
-    return Promise.resolve(this.games.delete(id));
+  async deleteBySlot(slot: number): Promise<boolean> {
+    return Promise.resolve(this.games.delete(slot));
   }
 
   async getAll(): Promise<Game[]> {
-    return Promise.resolve(Array.from(this.games.values()));
+    return Promise.resolve(
+      Array.from(this.games.values()).sort((a, b) => a.slot - b.slot),
+    );
   }
 
   // clear(): void {

@@ -5,6 +5,7 @@ import { Game } from "../../../shared/types/game";
 import { GameBoard } from "./GameBoard";
 import { fetchGames, createNewGame } from "@/lib/api";
 import { NewGameBoard } from "./NewGameBoard";
+import { MAX_SLOTS } from "../../../shared/types/game";
 
 interface GamesClientProps {
   initialGames: Game[];
@@ -34,19 +35,29 @@ export function GamesClient({ initialGames }: GamesClientProps) {
     };
   }, []);
 
-  const handleNewGame = async () => {
-    await createNewGame();
+  const handleNewGame = async (slot: number) => {
+    await createNewGame(slot);
   };
 
-  return (
-    <div>
-      <div className="flex flex-wrap gap-8 p-6">
-        {games.map((game: Game) => (
-          <GameBoard key={game.id} game={game} />
-        ))}
+  const slotsArrayLength = games.length
+    ? Math.min(games[games.length - 1].slot + 2, MAX_SLOTS)
+    : 1;
 
-        <NewGameBoard onClick={handleNewGame} />
-      </div>
+  const slots: (Game | null)[] = Array(slotsArrayLength).fill(null);
+
+  games.forEach((game) => {
+    slots[game.slot] = game;
+  });
+
+  return (
+    <div className="flex flex-wrap gap-8 p-6">
+      {slots.map((game, slot) => {
+        if (game) {
+          return <GameBoard key={game.slot} game={game} />;
+        }
+
+        return <NewGameBoard key={slot} slot={slot} onClick={handleNewGame} />;
+      })}
     </div>
   );
 }

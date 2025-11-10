@@ -45,7 +45,7 @@ export class GameService extends GameServiceBase {
       }
     }
 
-    const previousGame = await this.gameRepository.findById(game.id);
+    const previousGame = await this.gameRepository.findBySlot(game.slot);
 
     if (!previousGame) {
       // new game - board should be empty or have exactly one player move

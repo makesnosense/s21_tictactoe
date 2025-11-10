@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GameStorage } from './game.storage';
 import { Game } from 'src/datasource/models/game.model';
-import { UUID } from 'crypto';
 
 @Injectable()
 export class GameDbStorage extends GameStorage {
@@ -9,11 +8,11 @@ export class GameDbStorage extends GameStorage {
     throw new Error('DB storage not implemented yet');
   }
 
-  async findById(id: UUID): Promise<Game | null> {
+  async findBySlot(slot: number): Promise<Game | null> {
     throw new Error('DB storage not implemented yet');
   }
 
-  deleteById(id: UUID): Promise<boolean> {
+  deleteBySlot(slot: number): Promise<boolean> {
     throw new Error('DB storage not implemented yet');
   }
 

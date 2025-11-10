@@ -7,12 +7,11 @@ import {
   HttpStatus,
   Get,
   Delete,
-  MessageEvent,
+  ParseIntPipe,
   Sse,
 } from '@nestjs/common';
 
 import { Observable, Subject } from 'rxjs';
-import { randomUUID } from 'crypto';
 import { GameServiceBase } from 'src/domain/services/game.service.interface';
 import { GameRepository } from 'src/datasource/repositories/game.repository';
 import { GameMapper } from '../mappers/game.mapper';
@@ -21,13 +20,12 @@ import { CELL } from 'src/domain/models/board.model';
 import { createEmptyBoard } from '../../../../shared/types/board';
 
 import type { GameDto } from '../models/game.dto';
-import type { UUID } from 'crypto';
 import { Game } from 'src/domain/models/game.model';
 
 interface GameUpdateEvent {
   data: {
     type: 'game:updated' | 'game:created' | 'game:deleted';
-    gameId?: string;
+    slot: number;
   };
 }
 
@@ -46,9 +44,9 @@ export class GameController {
   }
 
   @Post()
-  async createNewGame(): Promise<GameDto> {
+  async createNewGame(@Body() body: { slot: number }): Promise<GameDto> {
     const newGame: Game = {
-      id: randomUUID(),
+      slot: body.slot,
       board: createEmptyBoard(),
       isGameOver: false,
       winner: null,
@@ -57,15 +55,15 @@ export class GameController {
     await this.gameRepository.save(newGame);
 
     this.eventSubject.next({
-      data: { type: 'game:created', gameId: newGame.id },
+      data: { type: 'game:created', slot: newGame.slot },
     });
 
     return GameMapper.toDto(newGame);
   }
 
-  @Post(':id')
+  @Post(':slot')
   async makeMove(
-    @Param('id') id: UUID,
+    @Param('slot', ParseIntPipe) slot: number,
     @Body() gameDto: GameDto,
   ): Promise<GameDto> {
     const game = GameMapper.toDomain(gameDto);
@@ -86,7 +84,7 @@ export class GameController {
       await this.gameRepository.save(game);
 
       this.eventSubject.next({
-        data: { type: 'game:updated', gameId: game.id },
+        data: { type: 'game:updated', slot: game.slot },
       });
       return GameMapper.toDto(game);
     }
@@ -103,17 +101,19 @@ export class GameController {
     await this.gameRepository.save(game);
 
     this.eventSubject.next({
-      data: { type: 'game:updated', gameId: game.id },
+      data: { type: 'game:updated', slot: game.slot },
     });
     return GameMapper.toDto(game);
   }
 
   @Delete(':id')
-  async deleteGame(@Param('id') id: UUID): Promise<boolean> {
-    const result = await this.gameRepository.deleteById(id);
+  async deleteGame(
+    @Param('slot', ParseIntPipe) slot: number,
+  ): Promise<boolean> {
+    const result = await this.gameRepository.deleteBySlot(slot);
     if (result) {
       this.eventSubject.next({
-        data: { type: 'game:deleted', gameId: id },
+        data: { type: 'game:deleted', slot },
       });
     }
     return result;
