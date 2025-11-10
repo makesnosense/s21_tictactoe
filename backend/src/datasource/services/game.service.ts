@@ -31,7 +31,7 @@ export class GameService extends GameServiceBase {
     return emptyCells[randomIndex];
   }
 
-  async validateBoard(game: Game): Promise<boolean> {
+  validateBoard(game: Game, previousGame: Game | null): boolean {
     if (game.board.length !== BOARD_SIZE) return false;
 
     for (const row of game.board) {
@@ -45,7 +45,7 @@ export class GameService extends GameServiceBase {
       }
     }
 
-    const previousGame = await this.gameRepository.findBySlot(game.slot);
+    // const previousGame = await this.gameRepository.findBySlot(game.slot);
 
     if (!previousGame) {
       // new game - board should be empty or have exactly one player move

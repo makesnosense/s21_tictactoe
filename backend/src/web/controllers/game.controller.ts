@@ -32,11 +32,17 @@ interface GameUpdateEvent {
 @Controller('games')
 export class GameController {
   private eventSubject = new Subject<GameUpdateEvent>();
+  private deletionTimers = new Map<number, NodeJS.Timeout>();
 
   constructor(
     private readonly gameService: GameServiceBase,
     private readonly gameRepository: GameRepository,
   ) {}
+
+  onModuleDestroy() {
+    this.deletionTimers.forEach((timer) => clearTimeout(timer));
+    this.deletionTimers.clear();
+  }
 
   @Sse('events')
   streamEvents(): Observable<GameUpdateEvent> {
@@ -68,7 +74,12 @@ export class GameController {
   ): Promise<GameDto> {
     const game = GameMapper.toDomain(gameDto);
 
-    const isValid = await this.gameService.validateBoard(game);
+    const existingGame = await this.gameRepository.findBySlot(slot);
+    if (existingGame?.isGameOver) {
+      throw new HttpException('Game has already ended', HttpStatus.BAD_REQUEST);
+    }
+
+    const isValid = await this.gameService.validateBoard(game, existingGame);
     if (!isValid) {
       throw new HttpException(
         'Invalid game state or move',
@@ -86,6 +97,10 @@ export class GameController {
       this.eventSubject.next({
         data: { type: 'game:updated', slot: game.slot },
       });
+
+      // schedule deletion after 5 seconds
+      this.scheduleDeletion(game.slot);
+
       return GameMapper.toDto(game);
     }
 
@@ -103,13 +118,23 @@ export class GameController {
     this.eventSubject.next({
       data: { type: 'game:updated', slot: game.slot },
     });
+
+    if (game.isGameOver) {
+      this.scheduleDeletion(game.slot);
+    }
+
     return GameMapper.toDto(game);
   }
 
-  @Delete(':id')
+  @Delete(':slot')
   async deleteGame(
     @Param('slot', ParseIntPipe) slot: number,
   ): Promise<boolean> {
+    if (this.deletionTimers.has(slot)) {
+      clearTimeout(this.deletionTimers.get(slot));
+      this.deletionTimers.delete(slot);
+    }
+
     const result = await this.gameRepository.deleteBySlot(slot);
     if (result) {
       this.eventSubject.next({
@@ -126,5 +151,19 @@ export class GameController {
     if (!games) return [];
 
     return games.map((game) => GameMapper.toDto(game));
+  }
+
+  private scheduleDeletion(slot: number): void {
+    if (this.deletionTimers.has(slot)) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      this.deleteGame(slot).catch((error) => {
+        console.error(`Failed to auto-delete game in slot ${slot}:`, error);
+      });
+    }, 5000);
+
+    this.deletionTimers.set(slot, timer);
   }
 }

@@ -4,7 +4,7 @@ import type { MoveCoordinates } from 'src/domain/models/board.model';
 export abstract class GameServiceBase {
   abstract calculateNextComputerMove(game: Game): MoveCoordinates;
 
-  abstract validateBoard(game: Game): Promise<boolean>;
+  abstract validateBoard(game: Game, previousGame: Game | null): boolean;
 
   abstract checkGameOver(game: Game): { isOver: boolean; winner: GameResult };
 }

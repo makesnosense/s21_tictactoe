@@ -14,11 +14,12 @@ interface CellProps {
 
 export function Cell({ cell, onClick }: CellProps) {
   return (
-    <span
+    <button
       className="grid aspect-square w-10 place-items-center bg-white dark:bg-zinc-950"
       onClick={onClick}
+      type="button"
     >
       {getCellIcon(cell)}
-    </span>
+    </button>
   );
 }
