@@ -79,7 +79,7 @@ export class GameController {
       throw new HttpException('Game has already ended', HttpStatus.BAD_REQUEST);
     }
 
-    const isValid = await this.gameService.validateBoard(game, existingGame);
+    const isValid = this.gameService.validateBoard(game, existingGame);
     if (!isValid) {
       throw new HttpException(
         'Invalid game state or move',
