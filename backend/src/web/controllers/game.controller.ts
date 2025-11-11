@@ -56,6 +56,7 @@ export class GameController {
       board: createEmptyBoard(),
       isGameOver: false,
       winner: null,
+      winningLine: null,
     };
 
     await this.gameRepository.save(newGame);
@@ -92,6 +93,7 @@ export class GameController {
     if (gameStatus.isOver) {
       game.isGameOver = true;
       game.winner = gameStatus.winner;
+      game.winningLine = gameStatus.winningLine;
       await this.gameRepository.save(game);
 
       this.eventSubject.next({
@@ -111,6 +113,7 @@ export class GameController {
     const finalStatus = this.gameService.checkGameOver(game);
     game.isGameOver = finalStatus.isOver;
     game.winner = finalStatus.winner;
+    game.winningLine = finalStatus.winningLine;
 
     // save updated game state
     await this.gameRepository.save(game);

@@ -1,4 +1,8 @@
-import type { Game, GameResult } from 'src/domain/models/game.model';
+import type {
+  Game,
+  GameResult,
+  WinningLine,
+} from 'src/domain/models/game.model';
 import type { MoveCoordinates } from 'src/domain/models/board.model';
 
 export abstract class GameServiceBase {
@@ -6,5 +10,9 @@ export abstract class GameServiceBase {
 
   abstract validateBoard(game: Game, previousGame: Game | null): boolean;
 
-  abstract checkGameOver(game: Game): { isOver: boolean; winner: GameResult };
+  abstract checkGameOver(game: Game): {
+    isOver: boolean;
+    winner: GameResult;
+    winningLine: WinningLine | null;
+  };
 }

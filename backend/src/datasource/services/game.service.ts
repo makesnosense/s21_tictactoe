@@ -12,7 +12,7 @@ import { cellValueToGameResult } from 'src/domain/models/game.model';
 
 import type { Game } from 'src/datasource/models/game.model';
 import type { Board } from 'src/datasource/models/board.model';
-import type { GameResult } from 'src/domain/models/game.model';
+import type { GameResult, WinningLine } from 'src/domain/models/game.model';
 
 @Injectable()
 export class GameService extends GameServiceBase {
@@ -80,7 +80,11 @@ export class GameService extends GameServiceBase {
     return differences === 1 && validPlayerMove;
   }
 
-  checkGameOver(game: Game): { isOver: boolean; winner: GameResult } {
+  checkGameOver(game: Game): {
+    isOver: boolean;
+    winner: GameResult;
+    winningLine: WinningLine | null;
+  } {
     const { board } = game;
 
     // check rows
@@ -90,7 +94,11 @@ export class GameService extends GameServiceBase {
         board[row][0] === board[row][1] &&
         board[row][1] === board[row][2]
       ) {
-        return { isOver: true, winner: cellValueToGameResult(board[row][0]) };
+        return {
+          isOver: true,
+          winner: cellValueToGameResult(board[row][0]),
+          winningLine: { start: { row, col: 0 }, end: { row, col: 2 } },
+        };
       }
     }
 
@@ -101,35 +109,51 @@ export class GameService extends GameServiceBase {
         board[0][col] === board[1][col] &&
         board[1][col] === board[2][col]
       ) {
-        return { isOver: true, winner: cellValueToGameResult(board[0][col]) };
+        return {
+          isOver: true,
+          winner: cellValueToGameResult(board[0][col]),
+          winningLine: { start: { row: 0, col }, end: { row: 2, col } },
+        };
       }
     }
 
-    // check diagonals
+    // check main diagonal
     if (
       board[0][0] !== CELL.EMPTY &&
       board[0][0] === board[1][1] &&
       board[1][1] === board[2][2]
     ) {
-      return { isOver: true, winner: cellValueToGameResult(board[0][0]) };
+      return {
+        isOver: true,
+        winner: cellValueToGameResult(board[0][0]),
+        winningLine: { start: { row: 0, col: 0 }, end: { row: 2, col: 2 } },
+      };
     }
 
+    // check anti-diagonal
     if (
       board[0][2] !== CELL.EMPTY &&
       board[0][2] === board[1][1] &&
       board[1][1] === board[2][0]
     ) {
-      return { isOver: true, winner: cellValueToGameResult(board[0][2]) };
+      return {
+        isOver: true,
+        winner: cellValueToGameResult(board[0][2]),
+        winningLine: { start: { row: 0, col: 2 }, end: { row: 2, col: 0 } },
+      };
     }
 
-    // check for draw (board full)
     const boardIsFull = this.getEmptyCells(board).length === 0;
 
     if (boardIsFull) {
-      return { isOver: true, winner: GAME_RESULT.DRAW }; // draw
+      return { isOver: true, winner: GAME_RESULT.DRAW, winningLine: null };
     }
 
-    return { isOver: false, winner: GAME_RESULT.IN_PROGRESS };
+    return {
+      isOver: false,
+      winner: GAME_RESULT.IN_PROGRESS,
+      winningLine: null,
+    };
   }
 
   private getEmptyCells(board: Board): MoveCoordinates[] {

@@ -7,6 +7,11 @@ export const GAME_RESULT = {
   COMPUTER_WIN: "computer wins",
 } as const;
 
+export interface WinningLine {
+  start: { row: number; col: number };
+  end: { row: number; col: number };
+}
+
 export type GameResult = ObjectValues<typeof GAME_RESULT>;
 
 export interface Game {
@@ -14,6 +19,7 @@ export interface Game {
   board: Board;
   isGameOver: boolean;
   winner: GameResult;
+  winningLine: WinningLine | null;
 }
 
 export const MAX_SLOTS = 24;
