@@ -1,9 +1,14 @@
 import { CELL } from './board.model';
 import type { CellValue } from './board.model';
-import { GAME_RESULT, type GameResult } from '../../../../shared/types/game';
+import {
+  GAME_RESULT,
+  type GameResult,
+  GAME_STATUS,
+  type GameStatus,
+} from '../../../../shared/types/game';
 
 export type { Game, WinningLine } from '../../../../shared/types/game';
-export { GAME_RESULT, type GameResult };
+export { GAME_RESULT, type GameResult, GAME_STATUS, type GameStatus };
 
 export const cellValueToGameResult = (cellValue: CellValue): GameResult => {
   switch (cellValue) {

@@ -1,6 +1,10 @@
 "use client";
 import { Cell } from "./Cell";
-import type { Game, GameResult } from "../../../shared/types/game";
+import {
+  GAME_STATUS,
+  type Game,
+  type GameResult,
+} from "../../../shared/types/game";
 import { makeMove } from "@/lib/api";
 import { CELL, CellValue } from "../../../shared/types/board";
 import { WinningLine } from "./WinningLine";
@@ -14,10 +18,10 @@ function getWinnerText(winner: GameResult): string {
 
 export function GameBoard({ game }: { game: Game }) {
   const isClickable = (cellValue: CellValue) =>
-    !game.isGameOver && cellValue === CELL.EMPTY;
+    game.status === GAME_STATUS.PLAYER_TURN && cellValue === CELL.EMPTY;
 
   const handleCellClick = async (idx: number) => {
-    if (game.isGameOver) return;
+    if (game.status !== GAME_STATUS.PLAYER_TURN) return;
 
     const row = Math.floor(idx / 3);
     const col = idx % 3;
@@ -49,11 +53,11 @@ export function GameBoard({ game }: { game: Game }) {
         ))}
       </div>
 
-      {game.isGameOver && game.winningLine && (
+      {game.status === GAME_STATUS.FINISHED && game.winningLine && (
         <WinningLine line={game.winningLine} />
       )}
 
-      {game.isGameOver && (
+      {game.status === GAME_STATUS.FINISHED && (
         <div className="absolute top-full left-1/2 -translate-x-1/2 text-nowrap">
           {getWinnerText(game.winner)}
         </div>

@@ -16,11 +16,12 @@ import { GameServiceBase } from 'src/domain/services/game.service.interface';
 import { GameRepository } from 'src/datasource/repositories/game.repository';
 import { GameMapper } from '../mappers/game.mapper';
 import { CELL } from 'src/domain/models/board.model';
+import { GAME_STATUS } from 'src/domain/models/game.model';
 
 import { createEmptyBoard } from '../../../../shared/types/board';
 
 import type { GameDto } from '../models/game.dto';
-import { Game } from 'src/domain/models/game.model';
+import type { Game } from 'src/domain/models/game.model';
 
 interface GameUpdateEvent {
   data: {
@@ -28,6 +29,11 @@ interface GameUpdateEvent {
     slot: number;
   };
 }
+
+const COMPUTER_MOVE_DELAY_MS = 900;
+const GAME_DELETION_DELAY_MS = 5000;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 @Controller('games')
 export class GameController {
@@ -54,7 +60,7 @@ export class GameController {
     const newGame: Game = {
       slot: body.slot,
       board: createEmptyBoard(),
-      isGameOver: false,
+      status: GAME_STATUS.PLAYER_TURN,
       winner: null,
       winningLine: null,
     };
@@ -76,8 +82,9 @@ export class GameController {
     const game = GameMapper.toDomain(gameDto);
 
     const existingGame = await this.gameRepository.findBySlot(slot);
-    if (existingGame?.isGameOver) {
-      throw new HttpException('Game has already ended', HttpStatus.BAD_REQUEST);
+
+    if (existingGame?.status !== GAME_STATUS.PLAYER_TURN) {
+      throw new HttpException('Not player turn', HttpStatus.BAD_REQUEST);
     }
 
     const isValid = this.gameService.validateBoard(game, existingGame);
@@ -91,7 +98,7 @@ export class GameController {
     // check if game is already over before computer move
     const gameStatus = this.gameService.checkGameOver(game);
     if (gameStatus.isOver) {
-      game.isGameOver = true;
+      game.status = GAME_STATUS.FINISHED;
       game.winner = gameStatus.winner;
       game.winningLine = gameStatus.winningLine;
       await this.gameRepository.save(game);
@@ -100,33 +107,47 @@ export class GameController {
         data: { type: 'game:updated', slot: game.slot },
       });
 
-      // schedule deletion after 5 seconds
       this.scheduleDeletion(game.slot);
 
       return GameMapper.toDto(game);
     }
 
+    game.status = GAME_STATUS.COMPUTER_TURN;
+    await this.gameRepository.save(game);
+    this.eventSubject.next({
+      data: { type: 'game:updated', slot: game.slot },
+    });
+
+    // schedule computer move asynchronously
+    this.scheduleComputerMove(game).catch((error) => {
+      console.error(`Computer move failed for slot ${slot}:`, error);
+    });
+
+    return GameMapper.toDto(game);
+  }
+  private async scheduleComputerMove(game: Game): Promise<void> {
+    await sleep(COMPUTER_MOVE_DELAY_MS);
     const computerMove = this.gameService.calculateNextComputerMove(game);
     game.board[computerMove.row][computerMove.col] = CELL.COMPUTER;
 
     // check if game is over AFTER computer move
     const finalStatus = this.gameService.checkGameOver(game);
-    game.isGameOver = finalStatus.isOver;
+
+    game.status = finalStatus.isOver
+      ? GAME_STATUS.FINISHED
+      : GAME_STATUS.PLAYER_TURN;
     game.winner = finalStatus.winner;
     game.winningLine = finalStatus.winningLine;
 
     // save updated game state
     await this.gameRepository.save(game);
-
     this.eventSubject.next({
       data: { type: 'game:updated', slot: game.slot },
     });
 
-    if (game.isGameOver) {
+    if (game.status === GAME_STATUS.FINISHED) {
       this.scheduleDeletion(game.slot);
     }
-
-    return GameMapper.toDto(game);
   }
 
   @Delete(':slot')
@@ -165,7 +186,7 @@ export class GameController {
       this.deleteGame(slot).catch((error) => {
         console.error(`Failed to auto-delete game in slot ${slot}:`, error);
       });
-    }, 5000);
+    }, GAME_DELETION_DELAY_MS);
 
     this.deletionTimers.set(slot, timer);
   }
