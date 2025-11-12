@@ -1,16 +1,16 @@
 "use client";
 import { Cell } from "./Cell";
-import type { Game } from "../../../shared/types/game";
+import type { Game, GameResult } from "../../../shared/types/game";
 import { makeMove } from "@/lib/api";
 import { CELL, CellValue } from "../../../shared/types/board";
 import { WinningLine } from "./WinningLine";
 
-// function getWinnerText(winner: GameResult): string {
-//   if (winner === "draw") return "Draw!";
-//   if (winner === "player wins") return "Player wins!";
-//   if (winner === "computer wins") return "Computer wins!";
-//   return "";
-// }
+function getWinnerText(winner: GameResult): string {
+  if (winner === "draw") return "draw";
+  if (winner === "player wins") return "player wins";
+  if (winner === "computer wins") return "computer wins";
+  return "";
+}
 
 export function GameBoard({ game }: { game: Game }) {
   const isClickable = (cellValue: CellValue) =>
@@ -53,8 +53,10 @@ export function GameBoard({ game }: { game: Game }) {
         <WinningLine line={game.winningLine} />
       )}
 
-      {game.isGameOver && !game.winningLine && (
-        <div className="absolute">draw</div>
+      {game.isGameOver && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 text-nowrap">
+          {getWinnerText(game.winner)}
+        </div>
       )}
     </div>
   );
