@@ -2,7 +2,7 @@
 import { Cell } from "./Cell";
 import type { Game } from "../../../shared/types/game";
 import { makeMove } from "@/lib/api";
-import { CELL } from "../../../shared/types/board";
+import { CELL, CellValue } from "../../../shared/types/board";
 import { WinningLine } from "./WinningLine";
 
 // function getWinnerText(winner: GameResult): string {
@@ -13,13 +13,17 @@ import { WinningLine } from "./WinningLine";
 // }
 
 export function GameBoard({ game }: { game: Game }) {
+  const isClickable = (cellValue: CellValue) =>
+    !game.isGameOver && cellValue === CELL.EMPTY;
+
   const handleCellClick = async (idx: number) => {
     if (game.isGameOver) return;
 
     const row = Math.floor(idx / 3);
     const col = idx % 3;
 
-    console.log(`Game ${game.slot}, cell [${row}][${col}] clicked`);
+    if (game.board[row][col] !== CELL.EMPTY) return;
+    // console.log(`Game ${game.slot}, cell [${row}][${col}] clicked`);
 
     const gameWithMove = structuredClone(game);
     gameWithMove.board[row][col] = CELL.PLAYER;
@@ -38,7 +42,8 @@ export function GameBoard({ game }: { game: Game }) {
         {board.map((cell, index) => (
           <Cell
             key={index}
-            cell={cell}
+            cellValue={cell}
+            isClickable={isClickable(cell)}
             onClick={() => handleCellClick(index)}
           />
         ))}
