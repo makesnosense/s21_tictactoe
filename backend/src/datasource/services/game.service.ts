@@ -49,8 +49,8 @@ export class GameService extends GameServiceBase {
 
     if (!previousGame) {
       // new game - board should be empty or have exactly one player move
-      const playerMoves = this.countCells(game.board, CELL.PLAYER);
-      const aiMoves = this.countCells(game.board, CELL.COMPUTER);
+      const playerMoves = this.countCellsOfType(game.board, CELL.PLAYER);
+      const aiMoves = this.countCellsOfType(game.board, CELL.COMPUTER);
       return playerMoves === 1 && aiMoves === 0;
     }
 
@@ -169,7 +169,7 @@ export class GameService extends GameServiceBase {
     return emptyCells;
   }
 
-  private countCells(board: Board, cellType: number): number {
+  private countCellsOfType(board: Board, cellType: number): number {
     let count = 0;
     for (const row of board) {
       for (const cell of row) {

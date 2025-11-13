@@ -6,7 +6,7 @@ import {
   type GameResult,
 } from "../../../shared/types/game";
 import { makeMove } from "@/lib/api";
-import { CELL, CellValue } from "../../../shared/types/board";
+import { CELL } from "../../../shared/types/board";
 import { WinningLine } from "./WinningLine";
 
 function getWinnerText(winner: GameResult): string {
