@@ -16,7 +16,13 @@ function getWinnerText(winner: GameResult): string {
   return "";
 }
 
-export function GameBoard({ game }: { game: Game }) {
+export function GameBoard({
+  game,
+  isBeingRemoved = false,
+}: {
+  game: Game;
+  isBeingRemoved: boolean;
+}) {
   const handleCellClick = async (idx: number) => {
     if (game.status !== GAME_STATUS.PLAYER_TURN) return;
 
@@ -38,7 +44,11 @@ export function GameBoard({ game }: { game: Game }) {
 
   const board = game.board.flat();
   return (
-    <div className="relative">
+    <div
+      className={`relative transition-opacity duration-300 ${
+        isBeingRemoved ? "opacity-0" : "opacity-100"
+      }`}
+    >
       <div className="grid cursor-pointer grid-cols-3 gap-px bg-zinc-300 dark:bg-zinc-700">
         {board.map((cell, index) => (
           <Cell

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Game } from "../../../shared/types/game";
 import { GameBoard } from "./GameBoard";
 import { fetchGames, createNewGame } from "@/lib/api";
@@ -13,6 +13,14 @@ interface GamesClientProps {
 
 export function GamesClient({ initialGames }: GamesClientProps) {
   const [games, setGames] = useState<Game[]>(initialGames);
+  const [gamesBeingRemoved, setGamesBeingRemoved] = useState<Map<number, Game>>(
+    new Map(),
+  );
+
+  const gamesRef = useRef(games);
+  useEffect(() => {
+    gamesRef.current = games;
+  }, [games]);
 
   useEffect(() => {
     const eventSource = new EventSource(
@@ -22,8 +30,34 @@ export function GamesClient({ initialGames }: GamesClientProps) {
     eventSource.onmessage = async (event) => {
       const data = JSON.parse(event.data);
       console.log("SSE event received:", data);
-      const updatedGames = await fetchGames();
-      setGames(updatedGames);
+
+      if (data.type === "game:deleted") {
+        const gameBeingRemoved = gamesRef.current.find(
+          (game) => game.slot === data.slot,
+        );
+        if (!gameBeingRemoved) return;
+
+        // add the game to the cache
+        setGamesBeingRemoved((prev) =>
+          new Map(prev).set(data.slot, gameBeingRemoved),
+        );
+
+        // setting timer that will wait for animation to complete and THEN fetch new games (with no removed game)
+        setTimeout(async () => {
+          const updatedGames = await fetchGames();
+          setGames(updatedGames);
+
+          // remove from cache after animation is complete
+          setGamesBeingRemoved((prev) => {
+            const next = new Map(prev);
+            next.delete(data.slot);
+            return next;
+          });
+        }, 300);
+      } else {
+        const updatedGames = await fetchGames();
+        setGames(updatedGames);
+      }
     };
 
     eventSource.onerror = (error) => {
@@ -39,24 +73,51 @@ export function GamesClient({ initialGames }: GamesClientProps) {
     await createNewGame(slot);
   };
 
-  const slotsArrayLength = games.length
-    ? Math.min(games[games.length - 1].slot + 2, MAX_SLOTS)
-    : 1;
+  const maxSlotFromGames = games.length > 0 ? games[games.length - 1].slot : -1;
+  const maxSlotFromGamesBeingRemoved =
+    gamesBeingRemoved.size > 0
+      ? Math.max(...Array.from(gamesBeingRemoved.keys()))
+      : -1;
+  const maxSlotFromBoth = Math.max(
+    maxSlotFromGames,
+    maxSlotFromGamesBeingRemoved,
+  );
 
-  const slots: (Game | null)[] = Array(slotsArrayLength).fill(null);
+  const slotsArrayLength =
+    games.length === 0 && gamesBeingRemoved.size === 0
+      ? 1
+      : Math.min(maxSlotFromBoth + 2, MAX_SLOTS);
+
+  const slots: ({ game: Game; isBeingRemoved: boolean } | null)[] =
+    Array(slotsArrayLength).fill(null);
 
   games.forEach((game) => {
-    slots[game.slot] = game;
+    slots[game.slot] = {
+      game,
+      isBeingRemoved: false,
+    };
+  });
+
+  gamesBeingRemoved.forEach((game, slot) => {
+    slots[slot] = { game, isBeingRemoved: true };
   });
 
   return (
     <div className="flex flex-wrap gap-8 p-6">
-      {slots.map((game, slot) => {
-        if (game) {
-          return <GameBoard key={game.slot} game={game} />;
+      {slots.map((slot, index) => {
+        if (slot) {
+          return (
+            <GameBoard
+              key={slot.game.slot}
+              game={slot.game}
+              isBeingRemoved={slot.isBeingRemoved}
+            />
+          );
         }
 
-        return <NewGameBoard key={slot} slot={slot} onClick={handleNewGame} />;
+        return (
+          <NewGameBoard key={index} slot={index} onClick={handleNewGame} />
+        );
       })}
     </div>
   );
