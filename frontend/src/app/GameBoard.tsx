@@ -17,9 +17,6 @@ function getWinnerText(winner: GameResult): string {
 }
 
 export function GameBoard({ game }: { game: Game }) {
-  const isClickable = (cellValue: CellValue) =>
-    game.status === GAME_STATUS.PLAYER_TURN && cellValue === CELL.EMPTY;
-
   const handleCellClick = async (idx: number) => {
     if (game.status !== GAME_STATUS.PLAYER_TURN) return;
 
@@ -42,12 +39,11 @@ export function GameBoard({ game }: { game: Game }) {
   const board = game.board.flat();
   return (
     <div className="relative">
-      <div className="grid grid-cols-3 gap-px bg-zinc-300 dark:bg-zinc-700">
+      <div className="grid cursor-pointer grid-cols-3 gap-px bg-zinc-300 dark:bg-zinc-700">
         {board.map((cell, index) => (
           <Cell
             key={index}
             cellValue={cell}
-            isClickable={isClickable(cell)}
             onClick={() => handleCellClick(index)}
           />
         ))}

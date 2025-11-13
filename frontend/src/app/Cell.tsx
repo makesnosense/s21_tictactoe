@@ -9,14 +9,14 @@ function getCellIcon(cellValue: CellValue) {
 
 interface CellProps {
   cellValue: CellValue;
-  isClickable: boolean;
+
   onClick: () => void;
 }
 
-export function Cell({ cellValue, isClickable, onClick }: CellProps) {
+export function Cell({ cellValue, onClick }: CellProps) {
   return (
     <button
-      className={`grid aspect-square w-10 place-items-center bg-white dark:bg-zinc-950 ${isClickable ? "cursor-pointer" : ""}`}
+      className={`grid aspect-square w-10 cursor-pointer place-items-center bg-white dark:bg-zinc-950`}
       onClick={onClick}
       type="button"
     >
