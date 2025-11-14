@@ -96,7 +96,7 @@ export class GameController {
     }
 
     // check if game is already over before computer move
-    const gameStatus = this.gameService.checkGameOver(game);
+    const gameStatus = this.gameService.checkGameOver(game.board);
     if (gameStatus.isOver) {
       game.status = GAME_STATUS.FINISHED;
       game.winner = gameStatus.winner;
@@ -131,7 +131,7 @@ export class GameController {
     game.board[computerMove.row][computerMove.col] = CELL.COMPUTER;
 
     // check if game is over AFTER computer move
-    const finalStatus = this.gameService.checkGameOver(game);
+    const finalStatus = this.gameService.checkGameOver(game.board);
 
     game.status = finalStatus.isOver
       ? GAME_STATUS.FINISHED

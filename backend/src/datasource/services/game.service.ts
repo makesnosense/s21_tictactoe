@@ -31,62 +31,11 @@ export class GameService extends GameServiceBase {
     return emptyCells[randomIndex];
   }
 
-  validateBoard(game: Game, previousGame: Game | null): boolean {
-    if (game.board.length !== BOARD_SIZE) return false;
-
-    for (const row of game.board) {
-      if (row.length !== BOARD_SIZE) return false;
-
-      const validCellValues = Object.values(CELL);
-      for (const cell of row) {
-        if (!validCellValues.includes(cell)) {
-          return false;
-        }
-      }
-    }
-
-    // const previousGame = await this.gameRepository.findBySlot(game.slot);
-
-    if (!previousGame) {
-      // new game - board should be empty or have exactly one player move
-      const playerMoves = this.countCellsOfType(game.board, CELL.PLAYER);
-      const aiMoves = this.countCellsOfType(game.board, CELL.COMPUTER);
-      return playerMoves === 1 && aiMoves === 0;
-    }
-
-    // compare boards - ensure exactly ONE new move was made by player
-    let differences = 0;
-    let validPlayerMove = false;
-
-    for (let row = 0; row < BOARD_SIZE; row++) {
-      for (let col = 0; col < BOARD_SIZE; col++) {
-        const oldCell = previousGame.board[row][col];
-        const newCell = game.board[row][col];
-
-        if (oldCell !== newCell) {
-          differences++;
-          // the change must be: empty → player
-          if (oldCell === CELL.EMPTY && newCell === CELL.PLAYER) {
-            validPlayerMove = true;
-          } else {
-            // invalid change (changed existing move or added COMPUTER move)
-            return false;
-          }
-        }
-      }
-    }
-
-    // must be exactly one difference and it must be a valid player move
-    return differences === 1 && validPlayerMove;
-  }
-
-  checkGameOver(game: Game): {
+  checkGameOver(board: Board): {
     isOver: boolean;
     winner: GameResult;
     winningLine: WinningLine | null;
   } {
-    const { board } = game;
-
     // check rows
     for (let row = 0; row < BOARD_SIZE; row++) {
       if (
@@ -177,5 +126,54 @@ export class GameService extends GameServiceBase {
       }
     }
     return count;
+  }
+
+  validateBoard(game: Game, previousGame: Game | null): boolean {
+    if (game.board.length !== BOARD_SIZE) return false;
+
+    for (const row of game.board) {
+      if (row.length !== BOARD_SIZE) return false;
+
+      const validCellValues = Object.values(CELL);
+      for (const cell of row) {
+        if (!validCellValues.includes(cell)) {
+          return false;
+        }
+      }
+    }
+
+    // const previousGame = await this.gameRepository.findBySlot(game.slot);
+
+    if (!previousGame) {
+      // new game - board should be empty or have exactly one player move
+      const playerMoves = this.countCellsOfType(game.board, CELL.PLAYER);
+      const aiMoves = this.countCellsOfType(game.board, CELL.COMPUTER);
+      return playerMoves === 1 && aiMoves === 0;
+    }
+
+    // compare boards - ensure exactly ONE new move was made by player
+    let differences = 0;
+    let validPlayerMove = false;
+
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      for (let col = 0; col < BOARD_SIZE; col++) {
+        const oldCell = previousGame.board[row][col];
+        const newCell = game.board[row][col];
+
+        if (oldCell !== newCell) {
+          differences++;
+          // the change must be: empty → player
+          if (oldCell === CELL.EMPTY && newCell === CELL.PLAYER) {
+            validPlayerMove = true;
+          } else {
+            // invalid change (changed existing move or added COMPUTER move)
+            return false;
+          }
+        }
+      }
+    }
+
+    // must be exactly one difference and it must be a valid player move
+    return differences === 1 && validPlayerMove;
   }
 }
