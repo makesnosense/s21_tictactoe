@@ -9,6 +9,8 @@ import { makeMove } from "@/lib/api";
 import { CELL } from "../../../shared/types/board";
 import { WinningLine } from "./WinningLine";
 
+import WaitingDots from "@/components/WaitingDots/WaitingDots";
+
 function getWinnerText(winner: GameResult): string {
   if (winner === "draw") return "draw";
   if (winner === "player wins") return "player wins";
@@ -62,6 +64,8 @@ export function GameBoard({
       {game.status === GAME_STATUS.FINISHED && game.winningLine && (
         <WinningLine line={game.winningLine} />
       )}
+
+      {game.status === GAME_STATUS.COMPUTER_TURN && <WaitingDots />}
 
       {game.status === GAME_STATUS.FINISHED && (
         <div className="absolute top-full left-1/2 -translate-x-1/2 text-nowrap">

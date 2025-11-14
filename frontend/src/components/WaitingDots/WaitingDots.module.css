@@ -1,0 +1,16 @@
+@keyframes pulse-scan {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  33% {
+    opacity: 1;
+  }
+  66% {
+    opacity: 0.3;
+  }
+}
+
+.animate-pulse-scan {
+  animation: pulse-scan 0.45s ease-in-out infinite;
+  display: inline-block;
+}
