@@ -14,6 +14,8 @@ import type { Game } from 'src/datasource/models/game.model';
 import type { Board } from 'src/datasource/models/board.model';
 import type { GameResult, WinningLine } from 'src/domain/models/game.model';
 
+const MISTAKE_PROBABILITY = 0.3;
+
 @Injectable()
 export class GameService extends GameServiceBase {
   constructor(private readonly gameRepository: GameRepository) {
@@ -21,6 +23,14 @@ export class GameService extends GameServiceBase {
   }
 
   calculateNextComputerMove(game: Game): MoveCoordinates {
+    if (Math.random() < MISTAKE_PROBABILITY) {
+      return this.getRandomComputerMove(game);
+    } else {
+      return this.getMinMaxedComputerMove(game);
+    }
+  }
+
+  getRandomComputerMove(game: Game): MoveCoordinates {
     const emptyCells = this.getEmptyCells(game.board);
 
     if (emptyCells.length === 0) {
@@ -29,6 +39,63 @@ export class GameService extends GameServiceBase {
 
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     return emptyCells[randomIndex];
+  }
+
+  getMinMaxedComputerMove(game: Game) {
+    const emptyCells = this.getEmptyCells(game.board);
+
+    const cellsAndScores = [];
+
+    for (const cell of emptyCells) {
+      const boardWithNewMove = structuredClone(game.board);
+      boardWithNewMove[cell.row][cell.col] = CELL.COMPUTER;
+      const score = this.minMax(boardWithNewMove, false, 0);
+      cellsAndScores.push({ cell: cell, score: score });
+    }
+
+    cellsAndScores.sort((a, b) => b.score - a.score);
+
+    const bestMoveComputerMove = cellsAndScores[0].cell;
+
+    return bestMoveComputerMove;
+  }
+
+  minMax(board: Board, isMaximizing: boolean, depth: number): number {
+    const currentResult = this.checkGameOver(board);
+    if (currentResult.isOver) {
+      if (currentResult.winner === GAME_RESULT.PLAYER_WIN) return -10 + depth;
+      else if (currentResult.winner === GAME_RESULT.COMPUTER_WIN)
+        return 10 - depth;
+      else {
+        return 0;
+      }
+    }
+
+    const emptyCells = this.getEmptyCells(board);
+
+    let bestScore;
+
+    if (isMaximizing) {
+      // is computer move
+      bestScore = -Infinity;
+
+      for (const cell of emptyCells) {
+        const boardWithNewMove = structuredClone(board);
+        boardWithNewMove[cell.row][cell.col] = CELL.COMPUTER;
+        const score = this.minMax(boardWithNewMove, false, depth + 1);
+        if (score > bestScore) bestScore = score;
+      }
+    } else {
+      // is player move
+      bestScore = Infinity;
+      for (const cell of emptyCells) {
+        const boardWithNewMove = structuredClone(board);
+        boardWithNewMove[cell.row][cell.col] = CELL.PLAYER;
+        const score = this.minMax(boardWithNewMove, true, depth + 1);
+        if (score < bestScore) bestScore = score;
+      }
+    }
+    return bestScore;
   }
 
   checkGameOver(board: Board): {
