@@ -23,7 +23,7 @@ export interface WinningLine {
 }
 
 export interface Game {
-  slot: number;
+  slot: number; // acts as unique identifier (UUID) for the game
   board: Board;
   status: GameStatus;
   winner: GameResult;
