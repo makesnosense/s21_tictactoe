@@ -1,7 +1,7 @@
 "use client";
 import { CirclePlus } from "lucide-react";
 import { BOARD_SIZE } from "../../../shared/types/board";
-import newGameBoardStyles from "./NewGameBoard.module.css";
+import styles from "./NewGameBoard.module.css";
 
 interface NewGameBoardProps {
   slot: number;
@@ -9,11 +9,9 @@ interface NewGameBoardProps {
 }
 
 export function NewGameBoard({ slot, onClick }: NewGameBoardProps) {
+  const BUTTON_CLASSES = `${styles["animate-fade-in"]} group relative h-[122px] w-[122px] rounded border border-dashed border-zinc-100 transition-colors duration-200 hover:border-zinc-200 dark:border-zinc-700/50 dark:hover:border-zinc-700`;
   return (
-    <button
-      onClick={() => onClick(slot)}
-      className={`${newGameBoardStyles["animate-fade-in"]} group styles.animate-fade-in relative h-[calc(3*2.5rem+2*1px)] w-[calc(3*2.5rem+2*1px)] rounded border border-dashed border-zinc-100 transition-colors duration-200 hover:border-zinc-200 dark:border-zinc-700/50 dark:hover:border-zinc-700`}
-    >
+    <button onClick={() => onClick(slot)} className={BUTTON_CLASSES}>
       <div className="absolute inset-0 grid grid-cols-3 gap-px bg-white transition-colors duration-300 ease-out group-hover:bg-zinc-100 dark:bg-zinc-950 dark:group-hover:bg-zinc-800">
         {[...Array(BOARD_SIZE * BOARD_SIZE)].map((_, index) => (
           <span key={index} className="bg-white dark:bg-zinc-950" />
