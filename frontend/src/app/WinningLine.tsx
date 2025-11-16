@@ -6,12 +6,13 @@ interface WinningLineProps {
 }
 
 export function WinningLine({ line }: WinningLineProps) {
-  const cellSize = 40;
-  const gap = 1;
+  const CELL_SIZE = 40;
+  const GAP = 1;
+  const GRID_TOTAL = CELL_SIZE * 3 + GAP * 2; // 122
 
   const getCellCenterCoordinates = (pos: { row: number; col: number }) => ({
-    x: pos.col * (cellSize + gap) + cellSize / 2,
-    y: pos.row * (cellSize + gap) + cellSize / 2,
+    x: pos.col * (CELL_SIZE + GAP) + CELL_SIZE / 2,
+    y: pos.row * (CELL_SIZE + GAP) + CELL_SIZE / 2,
   });
 
   const start = getCellCenterCoordinates(line.start);
@@ -26,7 +27,7 @@ export function WinningLine({ line }: WinningLineProps) {
   return (
     <svg
       className="pointer-events-none absolute inset-0"
-      viewBox="0 0 123 123" // 3 cells * 40px + 2 gaps * 1px = 122px
+      viewBox={`0 0 ${GRID_TOTAL} ${GRID_TOTAL}`} // 3 cells * 40px + 2 gaps * 1px = 122px
       xmlns="http://www.w3.org/2000/svg"
     >
       <line
