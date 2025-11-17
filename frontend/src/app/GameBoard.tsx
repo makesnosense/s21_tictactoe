@@ -47,7 +47,7 @@ export function GameBoard({
   const board = game.board.flat();
   return (
     <div
-      className={`relative transition-opacity duration-300 ${
+      className={`relative h-[122px] w-[122px] transition-opacity duration-300 ${
         isBeingRemoved ? "opacity-0" : "opacity-100"
       }`}
     >
