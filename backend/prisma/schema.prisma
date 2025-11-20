@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Game {
+  slot        Int     @id // slot-based ID system
+  board       Json // CellValue[][] stored as JSON
+  status      String // "player_turn" | "computer_turn" | "finished"
+  winner      String? // "draw" | "player wins" | "computer wins" | null
+  winningLine Json? // { start: {row, col}, end: {row, col} } | null
+
+  @@map("games")
+}
