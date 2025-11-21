@@ -21,4 +21,8 @@ export class GameRepository {
   async getAll(): Promise<Game[] | null> {
     return this.storage.getAll();
   }
+
+  async clear(): Promise<void> {
+    return this.storage.clear();
+  }
 }

@@ -25,7 +25,7 @@ export class GameInmemoryStorage extends GameStorage {
     );
   }
 
-  // clear(): void {
-  //   this.games.clear();
-  // }
+  async clear(): Promise<void> {
+    return Promise.resolve(this.games.clear());
+  }
 }

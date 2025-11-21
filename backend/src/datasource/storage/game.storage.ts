@@ -5,5 +5,5 @@ export abstract class GameStorage {
   abstract findBySlot(slot: number): Promise<Game | null>;
   abstract deleteBySlot(slot: number): Promise<boolean>;
   abstract getAll(): Promise<Game[]>;
-  // abstract clear(): void;
+  abstract clear(): Promise<void>;
 }
