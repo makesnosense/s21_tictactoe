@@ -35,7 +35,7 @@ export class GameDbStorage extends GameStorage {
   }
 
   async getAll(): Promise<domainGame[]> {
-    const games = await this.prisma.game.findMany();
+    const games = await this.prisma.game.findMany({ orderBy: { slot: 'asc' } });
     return Promise.resolve(
       games.map((game: prismaGame) => GameDatasourceMapper.toDomain(game)),
     );
