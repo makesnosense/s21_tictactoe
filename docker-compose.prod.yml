@@ -1,20 +1,27 @@
 services:
   postgres:
-    env_file:
-      - ./backend/.env.production
-    ports: []
+    ports: []  
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: tictactoe-backend
+    restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
     env_file:
-      - ./backend/.env.production
+      - path: ./backend/.env
+        required: true
     depends_on:
       - postgres
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: tictactoe-frontend
+    restart: unless-stopped
     ports:
       - "127.0.0.1:3001:3001"
     environment:
