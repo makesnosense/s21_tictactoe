@@ -1,6 +1,8 @@
-import { Game as DomainGame } from 'src/domain/models/game.model';
-import { Game as PrismaGame } from '../../../generated/prisma/client';
-import { Prisma } from '@prisma/client';
+import { type Game as DomainGame } from 'src/domain/models/game.model';
+import {
+  Prisma,
+  type Game as PrismaGame,
+} from '../../../generated/prisma/client';
 
 export class GameDatasourceMapper {
   static toPrisma(game: DomainGame) {
