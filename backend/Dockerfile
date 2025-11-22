@@ -34,7 +34,7 @@ COPY --from=builder /app/backend/generated ./generated
 COPY --from=builder /app/backend/prisma ./prisma
 COPY --from=builder /app/backend/package*.json ./
 
-COPY backend/prisma.config.ts ./backend/
+COPY backend/prisma.config.ts ./prisma.config.ts
 
 RUN npm ci --only=production
 
