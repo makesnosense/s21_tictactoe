@@ -42,4 +42,4 @@ RUN chown -R nodeapp:nodejs /app
 
 USER nodeapp
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/backend/src/main"]
