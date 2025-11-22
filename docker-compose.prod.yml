@@ -1,6 +1,8 @@
 services:
   postgres:
     ports: []  
+    networks:
+      - internal  # only backend can reach it
 
   backend:
     build:
@@ -15,6 +17,9 @@ services:
         required: true
     depends_on:
       - postgres
+    networks:
+      - web      # nginx can reach backend
+      - internal # backend can reach postgres
 
   frontend:
     build:
@@ -26,6 +31,14 @@ services:
       - "127.0.0.1:3001:3001"
     depends_on:
       - backend
+    networks:
+      - web  # nginx can reach frontend
+
+networks:
+  web:
+    external: true
+  internal:
 
 volumes:
   postgres_data:
+    name: tictactoe_postgres_data
