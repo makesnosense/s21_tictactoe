@@ -1,9 +1,22 @@
 import { Game } from "../../../shared/types/game";
 
-const API_URL = "http://localhost:3000/api";
+const getBackendBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    // browser
+    return process.env.NODE_ENV === "production"
+      ? "" // relative URL through nginx
+      : "http://localhost:3000";
+  }
+  // server-side
+  return process.env.NODE_ENV === "production"
+    ? "http://backend:3000"
+    : "http://localhost:3000";
+};
+
+export const BACKEND_BASE_URL = getBackendBaseUrl();
 
 export async function fetchGames(): Promise<Game[]> {
-  const response = await fetch(`${API_URL}/games`);
+  const response = await fetch(`${BACKEND_BASE_URL}/api/games`);
   if (!response.ok) {
     throw new Error(`Failed to fetch games: ${response.statusText}`);
   }
@@ -11,7 +24,7 @@ export async function fetchGames(): Promise<Game[]> {
 }
 
 export async function createNewGame(slot: number): Promise<Game> {
-  const response = await fetch(`${API_URL}/games`, {
+  const response = await fetch(`${BACKEND_BASE_URL}/api/games`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ slot }),
@@ -23,7 +36,7 @@ export async function createNewGame(slot: number): Promise<Game> {
 }
 
 export async function makeMove(game: Game): Promise<Game> {
-  const response = await fetch(`${API_URL}/games/${game.slot}`, {
+  const response = await fetch(`${BACKEND_BASE_URL}/api/games/${game.slot}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(game),

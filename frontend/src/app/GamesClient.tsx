@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Game } from "../../../shared/types/game";
 import { GameBoard } from "./GameBoard";
-import { fetchGames, createNewGame } from "@/lib/api";
+import { BACKEND_BASE_URL, fetchGames, createNewGame } from "@/lib/api";
 import { NewGameBoard } from "./NewGameBoard";
 import { MAX_SLOTS } from "../../../shared/types/game";
 
@@ -23,9 +23,7 @@ export function GamesClient({ initialGames }: GamesClientProps) {
   }, [games]);
 
   useEffect(() => {
-    const eventSource = new EventSource(
-      "http://localhost:3000/api/games/events",
-    );
+    const eventSource = new EventSource(`${BACKEND_BASE_URL}/api/games/events`);
 
     eventSource.onmessage = async (event) => {
       const data = JSON.parse(event.data);
