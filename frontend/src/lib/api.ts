@@ -3,9 +3,15 @@ import { Game } from "../../../shared/types/game";
 const getBackendBaseUrl = () => {
   if (typeof window !== "undefined") {
     // browser
-    return process.env.NODE_ENV === "production"
-      ? "" // relative URL through nginx
-      : "http://localhost:3000";
+    // env set by next start
+    if (process.env.NODE_ENV === "production") {
+      return ""; // relative URL through nginx
+    }
+
+    // development: use same host as frontend
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    return `${protocol}//${hostname}:3000`;
   }
   // server-side
   return process.env.NODE_ENV === "production"
