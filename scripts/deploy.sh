@@ -10,7 +10,10 @@ PROJECT_ROOT="$SCRIPT_DIR/.."
 cd "$PROJECT_ROOT"
 
 echo "🛠️ Rebuilding containers..."
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --no-cache
+docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
+
+echo "⏻ Rebuilding containers..."
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 echo "✅ Deployment complete. Checking logs..."
 docker compose -f docker-compose.yml -f docker-compose.prod.yml logs --tail=50
