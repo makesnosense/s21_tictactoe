@@ -25,7 +25,10 @@ const gradient = generateRandomGradient();
 export function Background() {
   return (
     <>
-      <div className="fixed inset-0 -z-10" style={{ background: gradient }} />
+      <div
+        className="absolute inset-0 -z-10"
+        style={{ background: gradient }}
+      />
       <Noise />
     </>
   );
