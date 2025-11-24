@@ -8,7 +8,6 @@ import {
 import { makeMove } from "@/lib/api";
 import { CELL } from "../../../shared/types/board";
 import { WinningLine } from "./WinningLine";
-
 import WaitingDots from "@/components/WaitingDots/WaitingDots";
 
 function getWinnerText(winner: GameResult): string {
@@ -32,7 +31,6 @@ export function GameBoard({
     const col = idx % 3;
 
     if (game.board[row][col] !== CELL.EMPTY) return;
-    // console.log(`Game ${game.slot}, cell [${row}][${col}] clicked`);
 
     const gameWithMove = structuredClone(game);
     gameWithMove.board[row][col] = CELL.PLAYER;
@@ -45,13 +43,14 @@ export function GameBoard({
   };
 
   const board = game.board.flat();
+
   return (
     <div
       className={`relative h-[122px] w-[122px] transition-opacity duration-300 ${
         isBeingRemoved ? "opacity-0" : "opacity-100"
       }`}
     >
-      <div className="grid cursor-pointer grid-cols-3 gap-px bg-zinc-300 dark:bg-zinc-700">
+      <div className="grid cursor-pointer grid-cols-3 gap-px rounded-sm bg-white/5 p-px backdrop-blur-sm">
         {board.map((cell, index) => (
           <Cell
             key={index}

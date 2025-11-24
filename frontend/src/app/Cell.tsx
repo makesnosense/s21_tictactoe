@@ -16,7 +16,7 @@ interface CellProps {
 export function Cell({ cellValue, onClick }: CellProps) {
   return (
     <button
-      className={`grid aspect-square w-10 cursor-pointer place-items-center bg-white dark:bg-zinc-950`}
+      className={`grid aspect-square cursor-pointer place-items-center border border-white/20 bg-white/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.3),0_2px_8px_rgba(0,0,0,0.1)] transition-all duration-200 hover:border-white/30 hover:bg-white/20`}
       onClick={onClick}
       type="button"
     >
