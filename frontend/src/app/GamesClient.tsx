@@ -102,7 +102,7 @@ export function GamesClient({ initialGames }: GamesClientProps) {
 
   return (
     <div className="flex justify-center align-middle">
-      <div className="grid grid-cols-2 gap-20 p-8 sm:grid-cols-4 sm:gap-12 lg:grid-cols-6 xl:grid-cols-8">
+      <div className="grid grid-cols-2 gap-12 p-8 sm:grid-cols-4 sm:gap-12 lg:grid-cols-6 xl:grid-cols-8">
         {slots.map((slot, index) => {
           if (slot) {
             return (
