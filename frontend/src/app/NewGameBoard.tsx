@@ -1,4 +1,5 @@
 "use client";
+import { memo } from "react";
 import { CirclePlus } from "lucide-react";
 import { BOARD_SIZE } from "../../../shared/types/board";
 import styles from "./NewGameBoard.module.css";
@@ -8,7 +9,10 @@ interface NewGameBoardProps {
   onClick: (slot: number) => void;
 }
 
-export function NewGameBoard({ slot, onClick }: NewGameBoardProps) {
+export const NewGameBoard = memo(function NewGameBoard({
+  slot,
+  onClick,
+}: NewGameBoardProps) {
   return (
     <button
       onClick={() => onClick(slot)}
@@ -26,4 +30,4 @@ export function NewGameBoard({ slot, onClick }: NewGameBoardProps) {
       <CirclePlus className="absolute top-1/2 left-1/2 z-10 h-11 w-11 -translate-x-1/2 -translate-y-1/2 text-white/30 transition-all duration-200 ease-out group-hover:scale-110 group-hover:text-white/50" />
     </button>
   );
-}
+});

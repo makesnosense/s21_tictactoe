@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Game } from "../../../shared/types/game";
 import { GameBoard } from "./GameBoard";
 import { BACKEND_BASE_URL, fetchGames, createNewGame } from "@/lib/api";
@@ -67,9 +67,9 @@ export function GamesClient({ initialGames }: GamesClientProps) {
     };
   }, []);
 
-  const handleNewGame = async (slot: number) => {
+  const handleNewGame = useCallback(async (slot: number) => {
     await createNewGame(slot);
-  };
+  }, []);
 
   const maxSlotFromGames = games.length > 0 ? games[games.length - 1].slot : -1;
   const maxSlotFromGamesBeingRemoved =
