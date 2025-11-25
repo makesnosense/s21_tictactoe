@@ -23,47 +23,79 @@ export function GamesClient({ initialGames }: GamesClientProps) {
   }, [games]);
 
   useEffect(() => {
-    const eventSource = new EventSource(`${BACKEND_BASE_URL}/api/games/events`);
+    let eventSource: EventSource | null = null;
+    let hadError = false;
+    let reconnectTimeout: NodeJS.Timeout;
+    let reconnectAttempts = 0;
+    const maxAttempts = 10;
+    const reconnectDelay = 3000;
 
-    eventSource.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
-      console.log("SSE event received:", data);
+    const connect = () => {
+      eventSource = new EventSource(`${BACKEND_BASE_URL}/api/games/events`);
 
-      if (data.type === "game:deleted") {
-        const gameBeingRemoved = gamesRef.current.find(
-          (game) => game.slot === data.slot,
-        );
-        if (!gameBeingRemoved) return;
+      eventSource.onopen = () => {
+        if (hadError) {
+          console.log("✓ SSE reconnected successfully");
+          hadError = false;
+          reconnectAttempts = 0;
+        }
+      };
 
-        // add the game to the cache
-        setGamesBeingRemoved((prev) =>
-          new Map(prev).set(data.slot, gameBeingRemoved),
-        );
+      eventSource.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
 
-        // setting timer that will wait for animation to complete and THEN fetch new games (with no removed game)
-        setTimeout(async () => {
+        if (data.type === "game:deleted") {
+          const gameBeingRemoved = gamesRef.current.find(
+            (game) => game.slot === data.slot,
+          );
+          if (!gameBeingRemoved) return;
+
+          // add the game to the cache
+          setGamesBeingRemoved((prev) =>
+            new Map(prev).set(data.slot, gameBeingRemoved),
+          );
+
+          // setting timer that will wait for animation to complete and THEN fetch new games (with no removed game)
+          setTimeout(async () => {
+            const updatedGames = await fetchGames();
+            setGames(updatedGames);
+
+            // remove from cache after animation is complete
+            setGamesBeingRemoved((prev) => {
+              const next = new Map(prev);
+              next.delete(data.slot);
+              return next;
+            });
+          }, 300);
+        } else {
           const updatedGames = await fetchGames();
           setGames(updatedGames);
+        }
+      };
 
-          // remove from cache after animation is complete
-          setGamesBeingRemoved((prev) => {
-            const next = new Map(prev);
-            next.delete(data.slot);
-            return next;
-          });
-        }, 300);
-      } else {
-        const updatedGames = await fetchGames();
-        setGames(updatedGames);
-      }
+      eventSource.onerror = (error) => {
+        console.error("SSE error:", error);
+        eventSource?.close();
+        hadError = true;
+
+        reconnectAttempts++;
+        if (reconnectAttempts <= maxAttempts) {
+          console.log(
+            `Reconnecting SSE (attempt ${reconnectAttempts}/${maxAttempts}) in ${reconnectDelay}ms...`,
+          );
+          reconnectTimeout = setTimeout(connect, reconnectDelay);
+        } else {
+          console.error(
+            "Max reconnection attempts reached. Please refresh the page.",
+          );
+        }
+      };
     };
 
-    eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
-    };
-
+    connect();
     return () => {
-      eventSource.close();
+      clearTimeout(reconnectTimeout);
+      eventSource?.close();
     };
   }, []);
 
