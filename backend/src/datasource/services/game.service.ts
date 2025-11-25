@@ -14,7 +14,10 @@ import type { Game } from 'src/datasource/models/game.model';
 import type { Board } from 'src/datasource/models/board.model';
 import type { GameResult, WinningLine } from 'src/domain/models/game.model';
 
-const MISTAKE_PROBABILITY = 0.3;
+// higher temperature = more random, lower = more deterministic
+const TEMPERATURE = 2;
+
+// const MISTAKE_PROBABILITY = 0.3;
 
 @Injectable()
 export class GameService extends GameServiceBase {
@@ -23,11 +26,13 @@ export class GameService extends GameServiceBase {
   }
 
   calculateNextComputerMove(game: Game): MoveCoordinates {
-    if (Math.random() < MISTAKE_PROBABILITY) {
-      return this.getRandomComputerMove(game);
-    } else {
-      return this.getMinMaxedComputerMove(game);
-    }
+    // if (Math.random() < MISTAKE_PROBABILITY) {
+    //   return this.getRandomComputerMove(game);
+    // } else {
+    //   return this.getMinMaxedComputerMove(game);
+    // }
+
+    return this.getWeightedComputerMove(game);
   }
 
   getRandomComputerMove(game: Game): MoveCoordinates {
@@ -58,6 +63,33 @@ export class GameService extends GameServiceBase {
     const bestMoveComputerMove = cellsAndScores[0].cell;
 
     return bestMoveComputerMove;
+  }
+
+  getWeightedComputerMove(game: Game): MoveCoordinates {
+    const emptyCells = this.getEmptyCells(game.board);
+
+    const movesWithScores = emptyCells.map((cell) => {
+      const boardWithMove = structuredClone(game.board);
+      boardWithMove[cell.row][cell.col] = CELL.COMPUTER;
+      const score = this.minMax(boardWithMove, false, 0);
+      return { cell, score };
+    });
+
+    // softmax: convert scores to probabilities
+    const weights = movesWithScores.map((move) =>
+      Math.exp(move.score / TEMPERATURE),
+    );
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+    let random = Math.random() * totalWeight;
+
+    // this way we avoid explicit normalization
+    for (let i = 0; i < movesWithScores.length; i++) {
+      random -= weights[i];
+      if (random <= 0) return movesWithScores[i].cell;
+    }
+
+    return movesWithScores[0].cell; // fallback
   }
 
   minMax(board: Board, isMaximizing: boolean, depth: number): number {
