@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description: "Tic-Tac-Toe game",
   icons: {
     icon: {
-      url: "/favicon.svg",
-      type: "image/svg+xml",
+      url: "/favicon.png",
+      type: "image/png",
     },
   },
 };
