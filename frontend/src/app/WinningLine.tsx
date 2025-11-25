@@ -39,7 +39,7 @@ export function WinningLine({ line }: WinningLineProps) {
         strokeWidth="4"
         strokeLinecap="round"
         strokeDasharray={lineLength}
-        className={`${styles["animate-draw"]} animate-draw text-zinc-900 dark:text-zinc-100`}
+        className={`${styles["animate-draw"]} animate-draw text-zinc-900`}
         style={{ "--line-length": lineLength } as React.CSSProperties}
       />
     </svg>
