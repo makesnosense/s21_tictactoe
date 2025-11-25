@@ -45,6 +45,26 @@ export class GameController {
     private readonly gameRepository: GameRepository,
   ) {}
 
+  async onModuleInit() {
+    // clean up any finished games that should have been deleted before restart
+    const allGames = await this.gameRepository.getAll();
+    if (allGames) {
+      const finishedGames = allGames.filter(
+        (game) => game.status === GAME_STATUS.FINISHED,
+      );
+
+      for (const game of finishedGames) {
+        this.scheduleDeletion(game.slot);
+      }
+
+      if (finishedGames.length > 0) {
+        console.log(
+          `Scheduled deletion for ${finishedGames.length} finished game(s) on startup`,
+        );
+      }
+    }
+  }
+
   onModuleDestroy() {
     this.deletionTimers.forEach((timer) => clearTimeout(timer));
     this.deletionTimers.clear();
