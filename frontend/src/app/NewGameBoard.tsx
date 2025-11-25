@@ -22,7 +22,7 @@ export const NewGameBoard = memo(function NewGameBoard({
         {[...Array(BOARD_SIZE * BOARD_SIZE)].map((_, index) => (
           <span
             key={index}
-            className="aspect-square border border-white/10 bg-white/5 backdrop-blur-sm"
+            className="aspect-square border border-white/10 bg-white/5"
           />
         ))}
       </div>

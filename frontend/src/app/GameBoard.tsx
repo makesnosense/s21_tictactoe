@@ -52,7 +52,7 @@ export const GameBoard = memo(
           isBeingRemoved ? "opacity-0" : "opacity-100"
         }`}
       >
-        <div className="grid cursor-pointer grid-cols-3 gap-px rounded-sm bg-white/5 p-px backdrop-blur-sm">
+        <div className="grid cursor-pointer grid-cols-3 gap-px rounded-sm bg-white/5 p-px">
           {board.map((cell, index) => (
             <Cell
               key={index}
