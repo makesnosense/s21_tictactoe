@@ -1,18 +1,376 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameService } from './game.service';
+import { GameRepository } from '../repositories/game.repository';
+import { type Board, type CellValue, CELL } from '../models/board.model';
+import type { Game } from 'src/datasource/models/game.model';
+import { GAME_RESULT, GAME_STATUS } from 'src/domain/models/game.model';
 
 describe('GameService', () => {
   let service: GameService;
 
   beforeEach(async () => {
+    const mockRepo = {
+      save: vi.fn(),
+      findBySlot: vi.fn(),
+      deleteBySlot: vi.fn(),
+      getAll: vi.fn(),
+      clear: vi.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [GameService],
+      providers: [GameService, { provide: GameRepository, useValue: mockRepo }],
     }).compile();
 
     service = module.get<GameService>(GameService);
   });
 
-  it('should be defined', () => {
+  it('service should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('checkGameOver', () => {
+    it('detects horizontal win', () => {
+      const board: Board = [
+        [CELL.PLAYER, CELL.PLAYER, CELL.PLAYER],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const result = service.checkGameOver(board);
+
+      expect(result.isOver).toBe(true);
+      expect(result.winner).toBe(GAME_RESULT.PLAYER_WIN);
+      expect(result.winningLine).toEqual({
+        start: { row: 0, col: 0 },
+        end: { row: 0, col: 2 },
+      });
+    });
+
+    it('detects vertical win', () => {
+      const board: Board = [
+        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const result = service.checkGameOver(board);
+
+      expect(result.isOver).toBe(true);
+      expect(result.winner).toBe(GAME_RESULT.COMPUTER_WIN);
+      expect(result.winningLine).toEqual({
+        start: { row: 0, col: 0 },
+        end: { row: 2, col: 0 },
+      });
+    });
+
+    it('detects diagonal win (main)', () => {
+      const board: Board = [
+        [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.PLAYER, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER],
+      ];
+
+      const result = service.checkGameOver(board);
+
+      expect(result.isOver).toBe(true);
+      expect(result.winner).toBe(GAME_RESULT.PLAYER_WIN);
+      expect(result.winningLine).toEqual({
+        start: { row: 0, col: 0 },
+        end: { row: 2, col: 2 },
+      });
+    });
+
+    it('detects diagonal win (anti)', () => {
+      const board: Board = [
+        [CELL.EMPTY, CELL.EMPTY, CELL.COMPUTER],
+        [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const result = service.checkGameOver(board);
+
+      expect(result.isOver).toBe(true);
+      expect(result.winner).toBe(GAME_RESULT.COMPUTER_WIN);
+      expect(result.winningLine).toEqual({
+        start: { row: 0, col: 2 },
+        end: { row: 2, col: 0 },
+      });
+    });
+
+    it('detects draw', () => {
+      const board: Board = [
+        [CELL.PLAYER, CELL.COMPUTER, CELL.PLAYER],
+        [CELL.COMPUTER, CELL.COMPUTER, CELL.PLAYER],
+        [CELL.PLAYER, CELL.PLAYER, CELL.COMPUTER],
+      ];
+
+      const result = service.checkGameOver(board);
+
+      expect(result.isOver).toBe(true);
+      expect(result.winner).toBe(GAME_RESULT.DRAW);
+      expect(result.winningLine).toBeNull();
+    });
+
+    it('detects game in progress', () => {
+      const board: Board = [
+        [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const result = service.checkGameOver(board);
+
+      expect(result.isOver).toBe(false);
+      expect(result.winner).toBe(GAME_RESULT.IN_PROGRESS);
+      expect(result.winningLine).toBeNull();
+    });
+  });
+
+  describe('minimax algorithm', () => {
+    it('takes winning move when available', () => {
+      // computer can win by placing at [0,2]
+      const board: Board = [
+        [CELL.COMPUTER, CELL.COMPUTER, CELL.EMPTY],
+        [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const game: Game = {
+        slot: 0,
+        board,
+        status: GAME_STATUS.COMPUTER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const move = service.getMinMaxedComputerMove(game);
+
+      expect(move).toEqual({ row: 0, col: 2 });
+    });
+
+    it('blocks player from winning', () => {
+      // player about to win at [0,2], computer must block
+      const board: Board = [
+        [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
+        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const game: Game = {
+        slot: 0,
+        board,
+        status: GAME_STATUS.COMPUTER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const move = service.getMinMaxedComputerMove(game);
+
+      expect(move).toEqual({ row: 0, col: 2 });
+    });
+
+    it('chooses center on empty board or early game', () => {
+      const board: Board = [
+        [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      const game: Game = {
+        slot: 0,
+        board,
+        status: GAME_STATUS.COMPUTER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const move = service.getMinMaxedComputerMove(game);
+
+      // center is optimal after corner move
+      expect(move).toEqual({ row: 1, col: 1 });
+    });
+
+    it('never loses from any position', () => {
+      // test multiple random games to ensure minimax never loses
+      const testGames = 10;
+      let losses = 0;
+
+      for (let i = 0; i < testGames; i++) {
+        const result = playFullGame();
+        if (result === GAME_RESULT.PLAYER_WIN) {
+          losses++;
+        }
+      }
+
+      expect(losses).toBe(0);
+    });
+
+    // helper function to simulate a full game
+    function playFullGame(): string | null {
+      const board: Board = [
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
+
+      let currentPlayer: Omit<CellValue, typeof CELL.EMPTY> = CELL.PLAYER;
+
+      for (let turn = 0; turn < 9; turn++) {
+        const gameState = service.checkGameOver(board);
+        if (gameState.isOver) {
+          return gameState.winner;
+        }
+
+        const game: Game = {
+          slot: 0,
+          board,
+          status: GAME_STATUS.COMPUTER_TURN,
+          winner: null,
+          winningLine: null,
+        };
+
+        if (currentPlayer === CELL.PLAYER) {
+          // random player move
+          const randomCell = service.getRandomComputerMove(game);
+          board[randomCell.row][randomCell.col] = CELL.PLAYER;
+          currentPlayer = CELL.COMPUTER;
+        } else {
+          // minimax computer move
+          const move = service.getMinMaxedComputerMove(game);
+          board[move.row][move.col] = CELL.COMPUTER;
+          currentPlayer = CELL.PLAYER;
+        }
+      }
+
+      return service.checkGameOver(board).winner;
+    }
+  });
+
+  describe('validateBoard', () => {
+    it('accepts valid first move', () => {
+      const game: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const result = service.validateBoard(game, null);
+
+      expect(result).toBe(true);
+    });
+
+    it('rejects board with invalid dimensions', () => {
+      const game: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const result = service.validateBoard(game, null);
+
+      expect(result).toBe(false);
+    });
+
+    it('rejects multiple moves at once', () => {
+      const previousGame: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const currentGame: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.COMPUTER, CELL.PLAYER],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const result = service.validateBoard(currentGame, previousGame);
+
+      expect(result).toBe(false);
+    });
+
+    it('rejects changing existing cells', () => {
+      const previousGame: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const currentGame: Game = {
+        slot: 0,
+        board: [
+          [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY], // changed existing cell
+          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const result = service.validateBoard(currentGame, previousGame);
+
+      expect(result).toBe(false);
+    });
+
+    it('accepts valid next move', () => {
+      const previousGame: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const currentGame: Game = {
+        slot: 0,
+        board: [
+          [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        ],
+        status: GAME_STATUS.PLAYER_TURN,
+        winner: null,
+        winningLine: null,
+      };
+
+      const result = service.validateBoard(currentGame, previousGame);
+
+      expect(result).toBe(true);
+    });
   });
 });
