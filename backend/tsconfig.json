@@ -18,5 +18,10 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "../shared/**/*", "prisma.config.ts"]
+  "include": [
+    "src/**/*",
+    "../shared/**/*",
+    "prisma.config.ts",
+    "vitest.config.ts"
+  ]
 }
