@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Game } from 'src/datasource/models/game.model';
+import { Game } from '../../../../shared/types/game';
 import { GameStorage } from './game.storage';
 
 @Injectable()

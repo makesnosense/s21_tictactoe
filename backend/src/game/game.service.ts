@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { GameRepository } from 'src/datasource/repositories/game.repository';
-import { GameServiceBase } from 'src/domain/services/game.service.interface';
+import { GameStorage } from './storage/game.storage';
 import {
+  type Board,
   CELL,
   BOARD_SIZE,
   MoveCoordinates,
-} from 'src/domain/models/board.model';
+} from '../../../shared/types/board';
 
-import { GAME_RESULT } from 'src/domain/models/game.model';
-import { cellValueToGameResult } from 'src/domain/models/game.model';
-
-import type { Game } from 'src/datasource/models/game.model';
-import type { Board } from 'src/datasource/models/board.model';
-import type { GameResult, WinningLine } from 'src/domain/models/game.model';
+import {
+  type Game,
+  type GameResult,
+  type WinningLine,
+  GAME_RESULT,
+  cellValueToGameResult,
+} from '../../../shared/types/game';
 
 // higher temperature = more random, lower = more deterministic
 const TEMPERATURE = 2;
@@ -20,10 +21,8 @@ const TEMPERATURE = 2;
 // const MISTAKE_PROBABILITY = 0.3;
 
 @Injectable()
-export class GameService extends GameServiceBase {
-  constructor(private readonly gameRepository: GameRepository) {
-    super();
-  }
+export class GameService {
+  constructor(private readonly gameStorage: GameStorage) {}
 
   calculateNextComputerMove(game: Game): MoveCoordinates {
     // if (Math.random() < MISTAKE_PROBABILITY) {

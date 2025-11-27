@@ -1,16 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameService } from './game.service';
-import { GameRepository } from '../repositories/game.repository';
-import { type Board, type CellValue, CELL } from '../models/board.model';
-import type { Game } from 'src/datasource/models/game.model';
-import { GAME_RESULT, GAME_STATUS } from 'src/domain/models/game.model';
+import { GameStorage } from './storage/game.storage';
+import { type Board, type CellValue, CELL } from '../../../shared/types/board';
+import {
+  type Game,
+  GAME_RESULT,
+  GAME_STATUS,
+} from '../../../shared/types/game';
 
 describe('GameService', () => {
   let service: GameService;
 
   beforeEach(async () => {
-    const mockRepo = {
+    const mockStorage = {
       save: vi.fn(),
       findBySlot: vi.fn(),
       deleteBySlot: vi.fn(),
@@ -19,7 +22,7 @@ describe('GameService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [GameService, { provide: GameRepository, useValue: mockRepo }],
+      providers: [GameService, { provide: GameStorage, useValue: mockStorage }],
     }).compile();
 
     service = module.get<GameService>(GameService);

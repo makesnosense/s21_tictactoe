@@ -1,4 +1,4 @@
-import { Board } from "./board";
+import { Board, CELL, type CellValue } from "./board";
 import { ObjectValues } from "./utils";
 export const GAME_RESULT = {
   IN_PROGRESS: null,
@@ -8,6 +8,17 @@ export const GAME_RESULT = {
 } as const;
 
 export type GameResult = ObjectValues<typeof GAME_RESULT>;
+
+export const cellValueToGameResult = (cellValue: CellValue): GameResult => {
+  switch (cellValue) {
+    case CELL.PLAYER:
+      return GAME_RESULT.PLAYER_WIN;
+    case CELL.COMPUTER:
+      return GAME_RESULT.COMPUTER_WIN;
+    default:
+      throw new Error(`Cannot convert cell value ${cellValue} to game result`);
+  }
+};
 
 export const GAME_STATUS = {
   PLAYER_TURN: "player_turn",

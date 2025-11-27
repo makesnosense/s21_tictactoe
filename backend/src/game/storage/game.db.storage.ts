@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { GameStorage } from './game.storage';
-import { PrismaService } from '../services/prisma.service';
 import { GameDatasourceMapper } from '../mappers/game.mapper';
-import type { Game as domainGame } from '../models/game.model';
+import { PrismaService } from 'src/prisma/prisma.service';
+import type { Game as domainGame } from '../../../../shared/types/game';
 import type { Game as prismaGame } from '../../../generated/prisma/client';
 
 @Injectable()

@@ -12,16 +12,13 @@ import {
 } from '@nestjs/common';
 
 import { Observable, Subject } from 'rxjs';
-import { GameServiceBase } from 'src/domain/services/game.service.interface';
-import { GameRepository } from 'src/datasource/repositories/game.repository';
-import { GameMapper } from '../mappers/game.mapper';
-import { CELL } from 'src/domain/models/board.model';
-import { GAME_STATUS } from 'src/domain/models/game.model';
+import { GameService } from './game.service';
 
-import { createEmptyBoard } from '../../../../shared/types/board';
+import { GameStorage } from './storage/game.storage';
+import { CELL } from '../../../shared/types/board';
 
-import type { GameDto } from '../models/game.dto';
-import type { Game } from 'src/domain/models/game.model';
+import { createEmptyBoard } from '../../../shared/types/board';
+import { GAME_STATUS, type Game } from '../../../shared/types/game';
 
 interface GameUpdateEvent {
   data: {
@@ -41,13 +38,13 @@ export class GameController {
   private deletionTimers = new Map<number, NodeJS.Timeout>();
 
   constructor(
-    private readonly gameService: GameServiceBase,
-    private readonly gameRepository: GameRepository,
+    private readonly gameService: GameService,
+    private readonly gameStorage: GameStorage,
   ) {}
 
   async onModuleInit() {
     // clean up any finished games that should have been deleted before restart
-    const allGames = await this.gameRepository.getAll();
+    const allGames = await this.gameStorage.getAll();
     if (allGames) {
       const finishedGames = allGames.filter(
         (game) => game.status === GAME_STATUS.FINISHED,
@@ -76,7 +73,7 @@ export class GameController {
   }
 
   @Post()
-  async createNewGame(@Body() body: { slot: number }): Promise<GameDto> {
+  async createNewGame(@Body() body: { slot: number }): Promise<Game> {
     const newGame: Game = {
       slot: body.slot,
       board: createEmptyBoard(),
@@ -85,23 +82,21 @@ export class GameController {
       winningLine: null,
     };
 
-    await this.gameRepository.save(newGame);
+    await this.gameStorage.save(newGame);
 
     this.eventSubject.next({
       data: { type: 'game:created', slot: newGame.slot },
     });
 
-    return GameMapper.toDto(newGame);
+    return newGame;
   }
 
   @Post(':slot')
   async makeMove(
     @Param('slot', ParseIntPipe) slot: number,
-    @Body() gameDto: GameDto,
-  ): Promise<GameDto> {
-    const game = GameMapper.toDomain(gameDto);
-
-    const existingGame = await this.gameRepository.findBySlot(slot);
+    @Body() game: Game,
+  ): Promise<Game> {
+    const existingGame = await this.gameStorage.findBySlot(slot);
 
     if (existingGame?.status !== GAME_STATUS.PLAYER_TURN) {
       throw new HttpException('Not player turn', HttpStatus.BAD_REQUEST);
@@ -121,7 +116,7 @@ export class GameController {
       game.status = GAME_STATUS.FINISHED;
       game.winner = gameStatus.winner;
       game.winningLine = gameStatus.winningLine;
-      await this.gameRepository.save(game);
+      await this.gameStorage.save(game);
 
       this.eventSubject.next({
         data: { type: 'game:updated', slot: game.slot },
@@ -129,11 +124,11 @@ export class GameController {
 
       this.scheduleDeletion(game.slot);
 
-      return GameMapper.toDto(game);
+      return game;
     }
 
     game.status = GAME_STATUS.COMPUTER_TURN;
-    await this.gameRepository.save(game);
+    await this.gameStorage.save(game);
     this.eventSubject.next({
       data: { type: 'game:updated', slot: game.slot },
     });
@@ -143,7 +138,7 @@ export class GameController {
       console.error(`Computer move failed for slot ${slot}:`, error);
     });
 
-    return GameMapper.toDto(game);
+    return game;
   }
   private async scheduleComputerMove(game: Game): Promise<void> {
     await sleep(COMPUTER_MOVE_DELAY_MS);
@@ -160,7 +155,7 @@ export class GameController {
     game.winningLine = finalStatus.winningLine;
 
     // save updated game state
-    await this.gameRepository.save(game);
+    await this.gameStorage.save(game);
     this.eventSubject.next({
       data: { type: 'game:updated', slot: game.slot },
     });
@@ -179,7 +174,7 @@ export class GameController {
       this.deletionTimers.delete(slot);
     }
 
-    const result = await this.gameRepository.deleteBySlot(slot);
+    const result = await this.gameStorage.deleteBySlot(slot);
     if (result) {
       this.eventSubject.next({
         data: { type: 'game:deleted', slot },
@@ -189,12 +184,12 @@ export class GameController {
   }
 
   @Get()
-  async getGames(): Promise<GameDto[]> {
-    const games = await this.gameRepository.getAll();
+  async getGames(): Promise<Game[]> {
+    const games = await this.gameStorage.getAll();
 
     if (!games) return [];
 
-    return games.map((game) => GameMapper.toDto(game));
+    return games;
   }
 
   private scheduleDeletion(slot: number): void {
