@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
+import { GameLogic } from 'src/common/game-logic';
 import { GameService } from './game.service';
 import { GameStorage } from './storage/game.storage';
 import { type Board, type CellValue, CELL } from '../../../shared/types/board';
@@ -40,7 +41,7 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const result = service.checkGameOver(board);
+      const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
       expect(result.winner).toBe(GAME_RESULT.PLAYER_WIN);
@@ -57,7 +58,7 @@ describe('GameService', () => {
         [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const result = service.checkGameOver(board);
+      const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
       expect(result.winner).toBe(GAME_RESULT.COMPUTER_WIN);
@@ -74,7 +75,7 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER],
       ];
 
-      const result = service.checkGameOver(board);
+      const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
       expect(result.winner).toBe(GAME_RESULT.PLAYER_WIN);
@@ -91,7 +92,7 @@ describe('GameService', () => {
         [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const result = service.checkGameOver(board);
+      const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
       expect(result.winner).toBe(GAME_RESULT.COMPUTER_WIN);
@@ -108,7 +109,7 @@ describe('GameService', () => {
         [CELL.PLAYER, CELL.PLAYER, CELL.COMPUTER],
       ];
 
-      const result = service.checkGameOver(board);
+      const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
       expect(result.winner).toBe(GAME_RESULT.DRAW);
@@ -122,7 +123,7 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const result = service.checkGameOver(board);
+      const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(false);
       expect(result.winner).toBe(GAME_RESULT.IN_PROGRESS);
@@ -220,7 +221,7 @@ describe('GameService', () => {
       let currentPlayer: Omit<CellValue, typeof CELL.EMPTY> = CELL.PLAYER;
 
       for (let turn = 0; turn < 9; turn++) {
-        const gameState = service.checkGameOver(board);
+        const gameState = GameLogic.checkGameOver(board);
         if (gameState.isOver) {
           return gameState.winner;
         }
@@ -246,7 +247,7 @@ describe('GameService', () => {
         }
       }
 
-      return service.checkGameOver(board).winner;
+      return GameLogic.checkGameOver(board).winner;
     }
   });
 
@@ -264,7 +265,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = service.validateBoard(game, null);
+      const result = GameLogic.validateBoard(game, null);
 
       expect(result).toBe(true);
     });
@@ -281,7 +282,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = service.validateBoard(game, null);
+      const result = GameLogic.validateBoard(game, null);
 
       expect(result).toBe(false);
     });
@@ -311,7 +312,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = service.validateBoard(currentGame, previousGame);
+      const result = GameLogic.validateBoard(currentGame, previousGame);
 
       expect(result).toBe(false);
     });
@@ -341,7 +342,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = service.validateBoard(currentGame, previousGame);
+      const result = GameLogic.validateBoard(currentGame, previousGame);
 
       expect(result).toBe(false);
     });
@@ -371,7 +372,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = service.validateBoard(currentGame, previousGame);
+      const result = GameLogic.validateBoard(currentGame, previousGame);
 
       expect(result).toBe(true);
     });

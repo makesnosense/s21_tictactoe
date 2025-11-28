@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 
 import { Observable, Subject } from 'rxjs';
+import { GameLogic } from 'src/common/game-logic';
 import { GameService } from './game.service';
 
 import { GameStorage } from './storage/game.storage';
@@ -102,7 +103,7 @@ export class GameController {
       throw new HttpException('Not player turn', HttpStatus.BAD_REQUEST);
     }
 
-    const isValid = this.gameService.validateBoard(game, existingGame);
+    const isValid = GameLogic.validateBoard(game, existingGame);
     if (!isValid) {
       throw new HttpException(
         'Invalid game state or move',
@@ -111,7 +112,7 @@ export class GameController {
     }
 
     // check if game is already over before computer move
-    const gameStatus = this.gameService.checkGameOver(game.board);
+    const gameStatus = GameLogic.checkGameOver(game.board);
     if (gameStatus.isOver) {
       game.status = GAME_STATUS.FINISHED;
       game.winner = gameStatus.winner;
@@ -146,7 +147,7 @@ export class GameController {
     game.board[computerMove.row][computerMove.col] = CELL.COMPUTER;
 
     // check if game is over AFTER computer move
-    const finalStatus = this.gameService.checkGameOver(game.board);
+    const finalStatus = GameLogic.checkGameOver(game.board);
 
     game.status = finalStatus.isOver
       ? GAME_STATUS.FINISHED
