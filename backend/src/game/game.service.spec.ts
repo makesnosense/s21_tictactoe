@@ -36,7 +36,7 @@ describe('GameService', () => {
   describe('checkGameOver', () => {
     it('detects horizontal win', () => {
       const board: Board = [
-        [CELL.PLAYER, CELL.PLAYER, CELL.PLAYER],
+        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.PLAYER_ONE],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
@@ -53,9 +53,9 @@ describe('GameService', () => {
 
     it('detects vertical win', () => {
       const board: Board = [
-        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
-        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
-        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
+        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
+        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -70,9 +70,9 @@ describe('GameService', () => {
 
     it('detects diagonal win (main)', () => {
       const board: Board = [
-        [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
-        [CELL.EMPTY, CELL.PLAYER, CELL.EMPTY],
-        [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER],
+        [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.PLAYER_ONE, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER_ONE],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -87,9 +87,9 @@ describe('GameService', () => {
 
     it('detects diagonal win (anti)', () => {
       const board: Board = [
-        [CELL.EMPTY, CELL.EMPTY, CELL.COMPUTER],
-        [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
-        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER_TWO],
+        [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -104,9 +104,9 @@ describe('GameService', () => {
 
     it('detects draw', () => {
       const board: Board = [
-        [CELL.PLAYER, CELL.COMPUTER, CELL.PLAYER],
-        [CELL.COMPUTER, CELL.COMPUTER, CELL.PLAYER],
-        [CELL.PLAYER, CELL.PLAYER, CELL.COMPUTER],
+        [CELL.PLAYER_ONE, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
+        [CELL.PLAYER_TWO, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
+        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.PLAYER_TWO],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -118,8 +118,8 @@ describe('GameService', () => {
 
     it('detects game in progress', () => {
       const board: Board = [
-        [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
-        [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+        [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
@@ -135,8 +135,8 @@ describe('GameService', () => {
     it('takes winning move when available', () => {
       // computer can win by placing at [0,2]
       const board: Board = [
-        [CELL.COMPUTER, CELL.COMPUTER, CELL.EMPTY],
-        [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
+        [CELL.PLAYER_TWO, CELL.PLAYER_TWO, CELL.EMPTY],
+        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
@@ -156,8 +156,8 @@ describe('GameService', () => {
     it('blocks player from winning', () => {
       // player about to win at [0,2], computer must block
       const board: Board = [
-        [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
-        [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
+        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
@@ -176,7 +176,7 @@ describe('GameService', () => {
 
     it('chooses center on empty board or early game', () => {
       const board: Board = [
-        [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+        [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
@@ -218,7 +218,7 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      let currentPlayer: Omit<CellValue, typeof CELL.EMPTY> = CELL.PLAYER;
+      let currentPlayer: Omit<CellValue, typeof CELL.EMPTY> = CELL.PLAYER_ONE;
 
       for (let turn = 0; turn < 9; turn++) {
         const gameState = GameLogic.checkGameOver(board);
@@ -234,16 +234,16 @@ describe('GameService', () => {
           winningLine: null,
         };
 
-        if (currentPlayer === CELL.PLAYER) {
+        if (currentPlayer === CELL.PLAYER_ONE) {
           // random player move
           const randomCell = service.getRandomComputerMove(game);
-          board[randomCell.row][randomCell.col] = CELL.PLAYER;
-          currentPlayer = CELL.COMPUTER;
+          board[randomCell.row][randomCell.col] = CELL.PLAYER_ONE;
+          currentPlayer = CELL.PLAYER_TWO;
         } else {
           // minimax computer move
           const move = service.getMinMaxedComputerMove(game);
-          board[move.row][move.col] = CELL.COMPUTER;
-          currentPlayer = CELL.PLAYER;
+          board[move.row][move.col] = CELL.PLAYER_TWO;
+          currentPlayer = CELL.PLAYER_ONE;
         }
       }
 
@@ -256,7 +256,7 @@ describe('GameService', () => {
       const game: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
@@ -274,7 +274,7 @@ describe('GameService', () => {
       const game: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.EMPTY],
+          [CELL.PLAYER_ONE, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,
@@ -291,8 +291,8 @@ describe('GameService', () => {
       const previousGame: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,
@@ -303,8 +303,8 @@ describe('GameService', () => {
       const currentGame: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
-          [CELL.EMPTY, CELL.COMPUTER, CELL.PLAYER],
+          [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
+          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,
@@ -321,8 +321,8 @@ describe('GameService', () => {
       const previousGame: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,
@@ -333,8 +333,8 @@ describe('GameService', () => {
       const currentGame: Game = {
         slot: 0,
         board: [
-          [CELL.COMPUTER, CELL.EMPTY, CELL.EMPTY], // changed existing cell
-          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY], // changed existing cell
+          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,
@@ -351,8 +351,8 @@ describe('GameService', () => {
       const previousGame: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,
@@ -363,8 +363,8 @@ describe('GameService', () => {
       const currentGame: Game = {
         slot: 0,
         board: [
-          [CELL.PLAYER, CELL.PLAYER, CELL.EMPTY],
-          [CELL.EMPTY, CELL.COMPUTER, CELL.EMPTY],
+          [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
+          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_STATUS.PLAYER_TURN,

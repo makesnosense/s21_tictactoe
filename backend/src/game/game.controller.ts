@@ -144,7 +144,7 @@ export class GameController {
   private async scheduleComputerMove(game: Game): Promise<void> {
     await sleep(COMPUTER_MOVE_DELAY_MS);
     const computerMove = this.gameService.calculateNextComputerMove(game);
-    game.board[computerMove.row][computerMove.col] = CELL.COMPUTER;
+    game.board[computerMove.row][computerMove.col] = CELL.PLAYER_TWO;
 
     // check if game is over AFTER computer move
     const finalStatus = GameLogic.checkGameOver(game.board);

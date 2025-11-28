@@ -4,8 +4,8 @@ export const BOARD_SIZE = 3;
 
 export const CELL = {
   EMPTY: 0,
-  PLAYER: 1,
-  COMPUTER: 2,
+  PLAYER_ONE: 1,
+  PLAYER_TWO: 2,
 } as const;
 
 export type CellValue = ObjectValues<typeof CELL>;

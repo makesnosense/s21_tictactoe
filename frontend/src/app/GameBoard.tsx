@@ -35,7 +35,7 @@ export const GameBoard = memo(
       if (game.board[row][col] !== CELL.EMPTY) return;
 
       const gameWithMove = structuredClone(game);
-      gameWithMove.board[row][col] = CELL.PLAYER;
+      gameWithMove.board[row][col] = CELL.PLAYER_ONE;
 
       try {
         await makeMove(gameWithMove);

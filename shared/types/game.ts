@@ -11,9 +11,9 @@ export type GameResult = ObjectValues<typeof GAME_RESULT>;
 
 export const cellValueToGameResult = (cellValue: CellValue): GameResult => {
   switch (cellValue) {
-    case CELL.PLAYER:
+    case CELL.PLAYER_ONE:
       return GAME_RESULT.PLAYER_WIN;
-    case CELL.COMPUTER:
+    case CELL.PLAYER_TWO:
       return GAME_RESULT.COMPUTER_WIN;
     default:
       throw new Error(`Cannot convert cell value ${cellValue} to game result`);

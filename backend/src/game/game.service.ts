@@ -53,7 +53,7 @@ export class GameService {
 
     for (const cell of emptyCells) {
       const boardWithNewMove = structuredClone(game.board);
-      boardWithNewMove[cell.row][cell.col] = CELL.COMPUTER;
+      boardWithNewMove[cell.row][cell.col] = CELL.PLAYER_TWO;
       const score = this.minMax(boardWithNewMove, false, 0);
       cellsAndScores.push({ cell: cell, score: score });
     }
@@ -70,7 +70,7 @@ export class GameService {
 
     const movesWithScores = emptyCells.map((cell) => {
       const boardWithMove = structuredClone(game.board);
-      boardWithMove[cell.row][cell.col] = CELL.COMPUTER;
+      boardWithMove[cell.row][cell.col] = CELL.PLAYER_TWO;
       const score = this.minMax(boardWithMove, false, 0);
       return { cell, score };
     });
@@ -113,7 +113,7 @@ export class GameService {
 
       for (const cell of emptyCells) {
         const boardWithNewMove = structuredClone(board);
-        boardWithNewMove[cell.row][cell.col] = CELL.COMPUTER;
+        boardWithNewMove[cell.row][cell.col] = CELL.PLAYER_TWO;
         const score = this.minMax(boardWithNewMove, false, depth + 1);
         if (score > bestScore) bestScore = score;
       }
@@ -122,7 +122,7 @@ export class GameService {
       bestScore = Infinity;
       for (const cell of emptyCells) {
         const boardWithNewMove = structuredClone(board);
-        boardWithNewMove[cell.row][cell.col] = CELL.PLAYER;
+        boardWithNewMove[cell.row][cell.col] = CELL.PLAYER_ONE;
         const score = this.minMax(boardWithNewMove, true, depth + 1);
         if (score < bestScore) bestScore = score;
       }
@@ -135,8 +135,11 @@ export class GameService {
 
     if (!previousGame) {
       // new game - board should be empty or have exactly one player move
-      const playerMoves = GameLogic.countCellsOfType(game.board, CELL.PLAYER);
-      const aiMoves = GameLogic.countCellsOfType(game.board, CELL.COMPUTER);
+      const playerMoves = GameLogic.countCellsOfType(
+        game.board,
+        CELL.PLAYER_ONE,
+      );
+      const aiMoves = GameLogic.countCellsOfType(game.board, CELL.PLAYER_TWO);
       return playerMoves === 1 && aiMoves === 0;
     }
 
@@ -149,6 +152,6 @@ export class GameService {
     if (diffs.length !== 1) return false;
 
     const diff = diffs[0];
-    return diff.oldValue === CELL.EMPTY && diff.newValue === CELL.PLAYER;
+    return diff.oldValue === CELL.EMPTY && diff.newValue === CELL.PLAYER_ONE;
   }
 }
