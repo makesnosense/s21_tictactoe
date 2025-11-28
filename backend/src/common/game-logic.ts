@@ -3,10 +3,11 @@ import {
   CELL,
   BOARD_SIZE,
   MoveCoordinates,
+  CellValue,
 } from '../../../shared/types/board';
 
 import {
-  type Game,
+  // type Game,
   type GameResult,
   type WinningLine,
   GAME_RESULT,
@@ -14,10 +15,10 @@ import {
 } from '../../../shared/types/game';
 
 export class GameLogic {
-  static validateBoard(game: Game, previousGame: Game | null): boolean {
-    if (game.board.length !== BOARD_SIZE) return false;
+  static hasValidStructure(board: Board): boolean {
+    if (board.length !== BOARD_SIZE) return false;
 
-    for (const row of game.board) {
+    for (const row of board) {
       if (row.length !== BOARD_SIZE) return false;
 
       const validCellValues = Object.values(CELL);
@@ -27,40 +28,27 @@ export class GameLogic {
         }
       }
     }
+    return true;
+  }
 
-    // const previousGame = await this.gameRepository.findBySlot(game.slot);
-
-    if (!previousGame) {
-      // new game - board should be empty or have exactly one player move
-      const playerMoves = GameLogic.countCellsOfType(game.board, CELL.PLAYER);
-      const aiMoves = GameLogic.countCellsOfType(game.board, CELL.COMPUTER);
-      return playerMoves === 1 && aiMoves === 0;
-    }
-
-    // compare boards - ensure exactly ONE new move was made by player
-    let differences = 0;
-    let validPlayerMove = false;
-
+  static countBoardDifferences(
+    board1: Board,
+    board2: Board,
+  ): { row: number; col: number; oldValue: CellValue; newValue: CellValue }[] {
+    const diffs = [];
     for (let row = 0; row < BOARD_SIZE; row++) {
       for (let col = 0; col < BOARD_SIZE; col++) {
-        const oldCell = previousGame.board[row][col];
-        const newCell = game.board[row][col];
-
-        if (oldCell !== newCell) {
-          differences++;
-          // the change must be: empty → player
-          if (oldCell === CELL.EMPTY && newCell === CELL.PLAYER) {
-            validPlayerMove = true;
-          } else {
-            // invalid change (changed existing move or added COMPUTER move)
-            return false;
-          }
+        if (board1[row][col] !== board2[row][col]) {
+          diffs.push({
+            row,
+            col,
+            oldValue: board1[row][col],
+            newValue: board2[row][col],
+          });
         }
       }
     }
-
-    // must be exactly one difference and it must be a valid player move
-    return differences === 1 && validPlayerMove;
+    return diffs;
   }
 
   static countCellsOfType(board: Board, cellType: number): number {

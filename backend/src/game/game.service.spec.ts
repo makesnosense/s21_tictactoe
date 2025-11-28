@@ -265,7 +265,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateBoard(game, null);
+      const result = service.validatePlayerMove(game, null);
 
       expect(result).toBe(true);
     });
@@ -282,7 +282,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateBoard(game, null);
+      const result = service.validatePlayerMove(game, null);
 
       expect(result).toBe(false);
     });
@@ -312,7 +312,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateBoard(currentGame, previousGame);
+      const result = service.validatePlayerMove(currentGame, previousGame);
 
       expect(result).toBe(false);
     });
@@ -342,7 +342,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateBoard(currentGame, previousGame);
+      const result = service.validatePlayerMove(currentGame, previousGame);
 
       expect(result).toBe(false);
     });
@@ -372,7 +372,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateBoard(currentGame, previousGame);
+      const result = service.validatePlayerMove(currentGame, previousGame);
 
       expect(result).toBe(true);
     });

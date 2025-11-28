@@ -103,7 +103,7 @@ export class GameController {
       throw new HttpException('Not player turn', HttpStatus.BAD_REQUEST);
     }
 
-    const isValid = GameLogic.validateBoard(game, existingGame);
+    const isValid = this.gameService.validatePlayerMove(game, existingGame);
     if (!isValid) {
       throw new HttpException(
         'Invalid game state or move',

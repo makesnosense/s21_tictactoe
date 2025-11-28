@@ -129,4 +129,26 @@ export class GameService {
     }
     return bestScore;
   }
+
+  validatePlayerMove(game: Game, previousGame: Game | null): boolean {
+    if (!GameLogic.hasValidStructure(game.board)) return false;
+
+    if (!previousGame) {
+      // new game - board should be empty or have exactly one player move
+      const playerMoves = GameLogic.countCellsOfType(game.board, CELL.PLAYER);
+      const aiMoves = GameLogic.countCellsOfType(game.board, CELL.COMPUTER);
+      return playerMoves === 1 && aiMoves === 0;
+    }
+
+    // compare boards - ensure exactly ONE new move was made by player
+    const diffs = GameLogic.countBoardDifferences(
+      previousGame.board,
+      game.board,
+    );
+
+    if (diffs.length !== 1) return false;
+
+    const diff = diffs[0];
+    return diff.oldValue === CELL.EMPTY && diff.newValue === CELL.PLAYER;
+  }
 }
