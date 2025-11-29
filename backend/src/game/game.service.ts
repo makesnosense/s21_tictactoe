@@ -130,15 +130,4 @@ export class GameService {
     }
     return bestScore;
   }
-
-  validatePlayerMove(
-    game: GameVsComputer,
-    previousGame: GameVsComputer | null,
-  ): boolean {
-    return GameLogic.validateMove(
-      game.board,
-      previousGame?.board ?? null,
-      CELL.PLAYER_ONE,
-    );
-  }
 }

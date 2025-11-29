@@ -18,7 +18,7 @@ export class GameLogic {
   static validateMove(
     currentBoard: Board,
     previousBoard: Board | null,
-    expectedPlayerMakingMove: CellValue,
+    playerExpectedToMakeMove: CellValue,
   ): boolean {
     if (!this.hasValidStructure(currentBoard)) return false;
 
@@ -32,7 +32,7 @@ export class GameLogic {
 
     const diff = diffs[0];
     return (
-      diff.oldValue === CELL.EMPTY && diff.newValue === expectedPlayerMakingMove
+      diff.oldValue === CELL.EMPTY && diff.newValue === playerExpectedToMakeMove
     );
   }
 
