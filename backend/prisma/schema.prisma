@@ -14,5 +14,5 @@ model Game {
   winner      String? // "draw" | "player wins" | "computer wins" | null
   winningLine Json? // { start: {row, col}, end: {row, col} } | null
 
-  @@map("games")
+  @@map("games_vs_computer")
 }

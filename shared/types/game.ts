@@ -1,5 +1,6 @@
 import { Board, CELL, type CellValue } from "./board";
 import { ObjectValues } from "./utils";
+
 export const GAME_RESULT = {
   IN_PROGRESS: null,
   DRAW: "draw",
