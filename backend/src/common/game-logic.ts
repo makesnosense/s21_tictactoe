@@ -15,12 +15,19 @@ import {
 } from '../../../shared/types/game';
 
 export class GameLogic {
-  static validateSingleMove(
-    oldBoard: Board,
-    newBoard: Board,
+  static validateMove(
+    currentBoard: Board,
+    previousBoard: Board | null,
     expectedPlayerMakingMove: CellValue,
   ): boolean {
-    const diffs = this.countBoardDifferences(oldBoard, newBoard);
+    if (!this.hasValidStructure(currentBoard)) return false;
+
+    if (!previousBoard) {
+      return this.validateFirstMove(currentBoard);
+    }
+
+    // single move validation
+    const diffs = this.countBoardDifferences(previousBoard, currentBoard);
     if (diffs.length !== 1) return false;
 
     const diff = diffs[0];
@@ -29,9 +36,9 @@ export class GameLogic {
     );
   }
 
-  static validateFirstMove(board: Board): boolean {
-    const playerOneMoves = this.countCellsOfType(board, CELL.PLAYER_ONE);
-    const playerTwoMoves = this.countCellsOfType(board, CELL.PLAYER_TWO);
+  static validateFirstMove(currentBoard: Board): boolean {
+    const playerOneMoves = this.countCellsOfType(currentBoard, CELL.PLAYER_ONE);
+    const playerTwoMoves = this.countCellsOfType(currentBoard, CELL.PLAYER_TWO);
     return playerOneMoves === 1 && playerTwoMoves === 0;
   }
 

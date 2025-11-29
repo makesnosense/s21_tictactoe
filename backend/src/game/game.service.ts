@@ -131,15 +131,9 @@ export class GameService {
   }
 
   validatePlayerMove(game: Game, previousGame: Game | null): boolean {
-    if (!GameLogic.hasValidStructure(game.board)) return false;
-
-    if (!previousGame) {
-      return GameLogic.validateFirstMove(game.board);
-    }
-
-    return GameLogic.validateSingleMove(
-      previousGame.board,
+    return GameLogic.validateMove(
       game.board,
+      previousGame?.board ?? null,
       CELL.PLAYER_ONE,
     );
   }
