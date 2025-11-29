@@ -134,24 +134,13 @@ export class GameService {
     if (!GameLogic.hasValidStructure(game.board)) return false;
 
     if (!previousGame) {
-      // new game - board should be empty or have exactly one player move
-      const playerMoves = GameLogic.countCellsOfType(
-        game.board,
-        CELL.PLAYER_ONE,
-      );
-      const aiMoves = GameLogic.countCellsOfType(game.board, CELL.PLAYER_TWO);
-      return playerMoves === 1 && aiMoves === 0;
+      return GameLogic.validateFirstMove(game.board);
     }
 
-    // compare boards - ensure exactly ONE new move was made by player
-    const diffs = GameLogic.countBoardDifferences(
+    return GameLogic.validateSingleMove(
       previousGame.board,
       game.board,
+      CELL.PLAYER_ONE,
     );
-
-    if (diffs.length !== 1) return false;
-
-    const diff = diffs[0];
-    return diff.oldValue === CELL.EMPTY && diff.newValue === CELL.PLAYER_ONE;
   }
 }
