@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { GameStorage } from './game.storage';
 import { GameDatasourceMapper } from '../mappers/game.mapper';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { DatabaseService } from 'src/database/database.service';
 import type { GameVsComputer as domainGame } from '../../../../shared/types/game';
 import type { Game as prismaGame } from '../../../generated/prisma/client';
 
 @Injectable()
 export class GameDbStorage extends GameStorage {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly prisma: DatabaseService) {
     super();
   }
   async save(game: domainGame): Promise<void> {
