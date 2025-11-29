@@ -5,9 +5,9 @@ import { GameService } from './game.service';
 import { GameStorage } from './storage/game.storage';
 import { type Board, type CellValue, CELL } from '../../../shared/types/board';
 import {
-  type Game,
+  type GameVsComputer,
   GAME_RESULT,
-  GAME_STATUS,
+  GAME_VS_COMPUTER_STATUS,
 } from '../../../shared/types/game';
 
 describe('GameService', () => {
@@ -44,7 +44,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.PLAYER_WIN);
+      expect(result.winner).toBe(GAME_RESULT.PLAYER_ONE_WINS);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 0 },
         end: { row: 0, col: 2 },
@@ -61,7 +61,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.COMPUTER_WIN);
+      expect(result.winner).toBe(GAME_RESULT.PLAYER_TWO_WINS);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 0 },
         end: { row: 2, col: 0 },
@@ -78,7 +78,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.PLAYER_WIN);
+      expect(result.winner).toBe(GAME_RESULT.PLAYER_ONE_WINS);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 0 },
         end: { row: 2, col: 2 },
@@ -95,7 +95,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.COMPUTER_WIN);
+      expect(result.winner).toBe(GAME_RESULT.PLAYER_TWO_WINS);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 2 },
         end: { row: 2, col: 0 },
@@ -140,10 +140,10 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const game: Game = {
+      const game: GameVsComputer = {
         slot: 0,
         board,
-        status: GAME_STATUS.COMPUTER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.COMPUTER_TURN,
         winner: null,
         winningLine: null,
       };
@@ -161,10 +161,10 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const game: Game = {
+      const game: GameVsComputer = {
         slot: 0,
         board,
-        status: GAME_STATUS.COMPUTER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.COMPUTER_TURN,
         winner: null,
         winningLine: null,
       };
@@ -181,10 +181,10 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      const game: Game = {
+      const game: GameVsComputer = {
         slot: 0,
         board,
-        status: GAME_STATUS.COMPUTER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.COMPUTER_TURN,
         winner: null,
         winningLine: null,
       };
@@ -202,7 +202,7 @@ describe('GameService', () => {
 
       for (let i = 0; i < testGames; i++) {
         const result = playFullGame();
-        if (result === GAME_RESULT.PLAYER_WIN) {
+        if (result === GAME_RESULT.PLAYER_ONE_WINS) {
           losses++;
         }
       }
@@ -226,10 +226,10 @@ describe('GameService', () => {
           return gameState.winner;
         }
 
-        const game: Game = {
+        const game: GameVsComputer = {
           slot: 0,
           board,
-          status: GAME_STATUS.COMPUTER_TURN,
+          status: GAME_VS_COMPUTER_STATUS.COMPUTER_TURN,
           winner: null,
           winningLine: null,
         };
@@ -253,126 +253,138 @@ describe('GameService', () => {
 
   describe('validateBoard', () => {
     it('accepts valid first move', () => {
-      const game: Game = {
+      const game: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const result = service.validatePlayerMove(game, null);
+      const result = GameLogic.validateMove(game.board, null, CELL.PLAYER_ONE);
 
       expect(result).toBe(true);
     });
 
     it('rejects board with invalid dimensions', () => {
-      const game: Game = {
+      const game: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const result = service.validatePlayerMove(game, null);
+      const result = GameLogic.validateMove(game.board, null, CELL.PLAYER_ONE);
 
       expect(result).toBe(false);
     });
 
     it('rejects multiple moves at once', () => {
-      const previousGame: Game = {
+      const previousGame: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const currentGame: Game = {
+      const currentGame: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
           [CELL.EMPTY, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const result = service.validatePlayerMove(currentGame, previousGame);
+      const result = GameLogic.validateMove(
+        currentGame.board,
+        previousGame.board,
+        CELL.PLAYER_ONE,
+      );
 
       expect(result).toBe(false);
     });
 
     it('rejects changing existing cells', () => {
-      const previousGame: Game = {
+      const previousGame: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const currentGame: Game = {
+      const currentGame: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY], // changed existing cell
           [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const result = service.validatePlayerMove(currentGame, previousGame);
+      const result = GameLogic.validateMove(
+        currentGame.board,
+        previousGame.board,
+        CELL.PLAYER_ONE,
+      );
 
       expect(result).toBe(false);
     });
 
     it('accepts valid next move', () => {
-      const previousGame: Game = {
+      const previousGame: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const currentGame: Game = {
+      const currentGame: GameVsComputer = {
         slot: 0,
         board: [
           [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
           [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
-        status: GAME_STATUS.PLAYER_TURN,
+        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
         winner: null,
         winningLine: null,
       };
 
-      const result = service.validatePlayerMove(currentGame, previousGame);
+      const result = GameLogic.validateMove(
+        currentGame.board,
+        previousGame.board,
+        CELL.PLAYER_ONE,
+      );
 
       expect(result).toBe(true);
     });

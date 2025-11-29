@@ -1,4 +1,4 @@
-import { Game } from "../../../shared/types/game";
+import { GameVsComputer } from "../../../shared/types/game";
 
 const getBackendBaseUrl = () => {
   if (typeof window !== "undefined") {
@@ -21,7 +21,7 @@ const getBackendBaseUrl = () => {
 
 export const BACKEND_BASE_URL = getBackendBaseUrl();
 
-export async function fetchGames(): Promise<Game[]> {
+export async function fetchGames(): Promise<GameVsComputer[]> {
   const response = await fetch(`${BACKEND_BASE_URL}/api/games`);
   if (!response.ok) {
     throw new Error(`Failed to fetch games: ${response.statusText}`);
@@ -29,7 +29,7 @@ export async function fetchGames(): Promise<Game[]> {
   return response.json();
 }
 
-export async function createNewGame(slot: number): Promise<Game> {
+export async function createNewGame(slot: number): Promise<GameVsComputer> {
   const response = await fetch(`${BACKEND_BASE_URL}/api/games`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -41,7 +41,7 @@ export async function createNewGame(slot: number): Promise<Game> {
   return response.json();
 }
 
-export async function makeMove(game: Game): Promise<Game> {
+export async function makeMove(game: GameVsComputer): Promise<GameVsComputer> {
   const response = await fetch(`${BACKEND_BASE_URL}/api/games/${game.slot}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -1,21 +1,21 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Game } from "../../../shared/types/game";
+import { GameVsComputer } from "../../../shared/types/game";
 import { GameBoard } from "./GameBoard";
 import { BACKEND_BASE_URL, fetchGames, createNewGame } from "@/lib/api";
 import { NewGameBoard } from "./NewGameBoard";
 import { MAX_SLOTS } from "../../../shared/types/game";
 
 interface GamesClientProps {
-  initialGames: Game[];
+  initialGames: GameVsComputer[];
 }
 
 export function GamesClient({ initialGames }: GamesClientProps) {
-  const [games, setGames] = useState<Game[]>(initialGames);
-  const [gamesBeingRemoved, setGamesBeingRemoved] = useState<Map<number, Game>>(
-    new Map(),
-  );
+  const [games, setGames] = useState<GameVsComputer[]>(initialGames);
+  const [gamesBeingRemoved, setGamesBeingRemoved] = useState<
+    Map<number, GameVsComputer>
+  >(new Map());
 
   const gamesRef = useRef(games);
   useEffect(() => {
@@ -118,7 +118,7 @@ export function GamesClient({ initialGames }: GamesClientProps) {
       ? 1
       : Math.min(maxSlotFromBoth + 2, MAX_SLOTS);
 
-  const slots: ({ game: Game; isBeingRemoved: boolean } | null)[] =
+  const slots: ({ game: GameVsComputer; isBeingRemoved: boolean } | null)[] =
     Array(slotsArrayLength).fill(null);
 
   games.forEach((game) => {
