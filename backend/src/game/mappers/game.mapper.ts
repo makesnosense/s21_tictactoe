@@ -1,4 +1,4 @@
-import { type Game as DomainGame } from '../../../../shared/types/game';
+import { type GameVsComputer as DomainGame } from '../../../../shared/types/game';
 import {
   Prisma,
   type Game as PrismaGame,

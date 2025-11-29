@@ -9,7 +9,7 @@ import {
 } from '../../../shared/types/board';
 
 import {
-  type Game,
+  type GameVsComputer,
   // type GameResult,
   // type WinningLine,
   GAME_RESULT,
@@ -25,7 +25,7 @@ const TEMPERATURE = 2;
 export class GameService {
   constructor(private readonly gameStorage: GameStorage) {}
 
-  calculateNextComputerMove(game: Game): MoveCoordinates {
+  calculateNextComputerMove(game: GameVsComputer): MoveCoordinates {
     // if (Math.random() < MISTAKE_PROBABILITY) {
     //   return this.getRandomComputerMove(game);
     // } else {
@@ -35,7 +35,7 @@ export class GameService {
     return this.getWeightedComputerMove(game);
   }
 
-  getRandomComputerMove(game: Game): MoveCoordinates {
+  getRandomComputerMove(game: GameVsComputer): MoveCoordinates {
     const emptyCells = GameLogic.getEmptyCells(game.board);
 
     if (emptyCells.length === 0) {
@@ -46,7 +46,7 @@ export class GameService {
     return emptyCells[randomIndex];
   }
 
-  getMinMaxedComputerMove(game: Game) {
+  getMinMaxedComputerMove(game: GameVsComputer) {
     const emptyCells = GameLogic.getEmptyCells(game.board);
 
     const cellsAndScores = [];
@@ -65,7 +65,7 @@ export class GameService {
     return bestMoveComputerMove;
   }
 
-  getWeightedComputerMove(game: Game): MoveCoordinates {
+  getWeightedComputerMove(game: GameVsComputer): MoveCoordinates {
     const emptyCells = GameLogic.getEmptyCells(game.board);
 
     const movesWithScores = emptyCells.map((cell) => {
@@ -95,8 +95,9 @@ export class GameService {
   minMax(board: Board, isMaximizing: boolean, depth: number): number {
     const currentResult = GameLogic.checkGameOver(board);
     if (currentResult.isOver) {
-      if (currentResult.winner === GAME_RESULT.PLAYER_WIN) return -10 + depth;
-      else if (currentResult.winner === GAME_RESULT.COMPUTER_WIN)
+      if (currentResult.winner === GAME_RESULT.PLAYER_ONE_WINS)
+        return -10 + depth;
+      else if (currentResult.winner === GAME_RESULT.PLAYER_TWO_WINS)
         return 10 - depth;
       else {
         return 0;
@@ -130,7 +131,10 @@ export class GameService {
     return bestScore;
   }
 
-  validatePlayerMove(game: Game, previousGame: Game | null): boolean {
+  validatePlayerMove(
+    game: GameVsComputer,
+    previousGame: GameVsComputer | null,
+  ): boolean {
     return GameLogic.validateMove(
       game.board,
       previousGame?.board ?? null,

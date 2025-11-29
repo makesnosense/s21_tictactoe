@@ -19,7 +19,10 @@ import { GameStorage } from './storage/game.storage';
 import { CELL } from '../../../shared/types/board';
 
 import { createEmptyBoard } from '../../../shared/types/board';
-import { GAME_STATUS, type Game } from '../../../shared/types/game';
+import {
+  GAME_VS_COMPUTER_STATUS,
+  type GameVsComputer,
+} from '../../../shared/types/game';
 
 interface GameUpdateEvent {
   data: {
@@ -48,7 +51,7 @@ export class GameController {
     const allGames = await this.gameStorage.getAll();
     if (allGames) {
       const finishedGames = allGames.filter(
-        (game) => game.status === GAME_STATUS.FINISHED,
+        (game) => game.status === GAME_VS_COMPUTER_STATUS.FINISHED,
       );
 
       for (const game of finishedGames) {
@@ -74,11 +77,11 @@ export class GameController {
   }
 
   @Post()
-  async createNewGame(@Body() body: { slot: number }): Promise<Game> {
-    const newGame: Game = {
+  async createNewGame(@Body() body: { slot: number }): Promise<GameVsComputer> {
+    const newGame: GameVsComputer = {
       slot: body.slot,
       board: createEmptyBoard(),
-      status: GAME_STATUS.PLAYER_TURN,
+      status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
       winner: null,
       winningLine: null,
     };
@@ -95,11 +98,11 @@ export class GameController {
   @Post(':slot')
   async makeMove(
     @Param('slot', ParseIntPipe) slot: number,
-    @Body() game: Game,
-  ): Promise<Game> {
+    @Body() game: GameVsComputer,
+  ): Promise<GameVsComputer> {
     const existingGame = await this.gameStorage.findBySlot(slot);
 
-    if (existingGame?.status !== GAME_STATUS.PLAYER_TURN) {
+    if (existingGame?.status !== GAME_VS_COMPUTER_STATUS.PLAYER_TURN) {
       throw new HttpException('Not player turn', HttpStatus.BAD_REQUEST);
     }
 
@@ -114,7 +117,7 @@ export class GameController {
     // check if game is already over before computer move
     const gameStatus = GameLogic.checkGameOver(game.board);
     if (gameStatus.isOver) {
-      game.status = GAME_STATUS.FINISHED;
+      game.status = GAME_VS_COMPUTER_STATUS.FINISHED;
       game.winner = gameStatus.winner;
       game.winningLine = gameStatus.winningLine;
       await this.gameStorage.save(game);
@@ -128,7 +131,7 @@ export class GameController {
       return game;
     }
 
-    game.status = GAME_STATUS.COMPUTER_TURN;
+    game.status = GAME_VS_COMPUTER_STATUS.COMPUTER_TURN;
     await this.gameStorage.save(game);
     this.eventSubject.next({
       data: { type: 'game:updated', slot: game.slot },
@@ -141,7 +144,7 @@ export class GameController {
 
     return game;
   }
-  private async scheduleComputerMove(game: Game): Promise<void> {
+  private async scheduleComputerMove(game: GameVsComputer): Promise<void> {
     await sleep(COMPUTER_MOVE_DELAY_MS);
     const computerMove = this.gameService.calculateNextComputerMove(game);
     game.board[computerMove.row][computerMove.col] = CELL.PLAYER_TWO;
@@ -150,8 +153,8 @@ export class GameController {
     const finalStatus = GameLogic.checkGameOver(game.board);
 
     game.status = finalStatus.isOver
-      ? GAME_STATUS.FINISHED
-      : GAME_STATUS.PLAYER_TURN;
+      ? GAME_VS_COMPUTER_STATUS.FINISHED
+      : GAME_VS_COMPUTER_STATUS.PLAYER_TURN;
     game.winner = finalStatus.winner;
     game.winningLine = finalStatus.winningLine;
 
@@ -161,7 +164,7 @@ export class GameController {
       data: { type: 'game:updated', slot: game.slot },
     });
 
-    if (game.status === GAME_STATUS.FINISHED) {
+    if (game.status === GAME_VS_COMPUTER_STATUS.FINISHED) {
       this.scheduleDeletion(game.slot);
     }
   }
@@ -185,7 +188,7 @@ export class GameController {
   }
 
   @Get()
-  async getGames(): Promise<Game[]> {
+  async getGames(): Promise<GameVsComputer[]> {
     const games = await this.gameStorage.getAll();
 
     if (!games) return [];

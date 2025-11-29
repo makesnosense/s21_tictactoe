@@ -2,9 +2,10 @@
 import { memo } from "react";
 import { Cell } from "./Cell";
 import {
-  GAME_STATUS,
-  type Game,
+  GAME_RESULT,
+  type GameVsComputer,
   type GameResult,
+  GAME_VS_COMPUTER_STATUS,
 } from "../../../shared/types/game";
 import { makeMove } from "@/lib/api";
 import { CELL } from "../../../shared/types/board";
@@ -13,8 +14,8 @@ import WaitingDots from "@/components/WaitingDots/WaitingDots";
 
 function getWinnerText(winner: GameResult): string {
   if (winner === "draw") return "draw";
-  if (winner === "player wins") return "player wins";
-  if (winner === "computer wins") return "computer wins";
+  if (winner === GAME_RESULT.PLAYER_ONE_WINS) return "player wins";
+  if (winner === GAME_RESULT.PLAYER_TWO_WINS) return "computer wins";
   return "";
 }
 
@@ -23,11 +24,11 @@ export const GameBoard = memo(
     game,
     isBeingRemoved = false,
   }: {
-    game: Game;
+    game: GameVsComputer;
     isBeingRemoved: boolean;
   }) {
     const handleCellClick = async (idx: number) => {
-      if (game.status !== GAME_STATUS.PLAYER_TURN) return;
+      if (game.status !== GAME_VS_COMPUTER_STATUS.PLAYER_TURN) return;
 
       const row = Math.floor(idx / 3);
       const col = idx % 3;
@@ -62,13 +63,14 @@ export const GameBoard = memo(
           ))}
         </div>
 
-        {game.status === GAME_STATUS.FINISHED && game.winningLine && (
-          <WinningLine line={game.winningLine} />
+        {game.status === GAME_VS_COMPUTER_STATUS.FINISHED &&
+          game.winningLine && <WinningLine line={game.winningLine} />}
+
+        {game.status === GAME_VS_COMPUTER_STATUS.COMPUTER_TURN && (
+          <WaitingDots />
         )}
 
-        {game.status === GAME_STATUS.COMPUTER_TURN && <WaitingDots />}
-
-        {game.status === GAME_STATUS.FINISHED && (
+        {game.status === GAME_VS_COMPUTER_STATUS.FINISHED && (
           <div className="absolute top-full left-1/2 -translate-x-1/2 text-nowrap">
             {getWinnerText(game.winner)}
           </div>

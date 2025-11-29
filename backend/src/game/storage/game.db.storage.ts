@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GameStorage } from './game.storage';
 import { GameDatasourceMapper } from '../mappers/game.mapper';
 import { PrismaService } from 'src/prisma/prisma.service';
-import type { Game as domainGame } from '../../../../shared/types/game';
+import type { GameVsComputer as domainGame } from '../../../../shared/types/game';
 import type { Game as prismaGame } from '../../../generated/prisma/client';
 
 @Injectable()
