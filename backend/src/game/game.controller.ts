@@ -19,6 +19,10 @@ import { GameStorage } from './storage/game.storage';
 import { CELL } from '../../../shared/types/board';
 
 import { createEmptyBoard } from '../../../shared/types/board';
+
+import { CreateGameDto } from './dtos/create-game.dto';
+import { MakeMoveDto } from './dtos/make-move.dto';
+
 import {
   GAME_VS_COMPUTER_STATUS,
   type GameVsComputer,
@@ -77,9 +81,11 @@ export class GameController {
   }
 
   @Post()
-  async createNewGame(@Body() body: { slot: number }): Promise<GameVsComputer> {
+  async createNewGame(
+    @Body() createGameDto: CreateGameDto,
+  ): Promise<GameVsComputer> {
     const newGame: GameVsComputer = {
-      slot: body.slot,
+      slot: createGameDto.slot,
       board: createEmptyBoard(),
       status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
       winner: null,
@@ -98,7 +104,7 @@ export class GameController {
   @Post(':slot')
   async makeMove(
     @Param('slot', ParseIntPipe) slot: number,
-    @Body() game: GameVsComputer,
+    @Body() makeMoveDto: MakeMoveDto,
   ): Promise<GameVsComputer> {
     const existingGame = await this.gameStorage.findBySlot(slot);
 
@@ -107,7 +113,7 @@ export class GameController {
     }
 
     const isValid = GameLogic.validateMove(
-      game.board,
+      makeMoveDto.board,
       existingGame.board,
       CELL.PLAYER_ONE,
     );
@@ -117,6 +123,15 @@ export class GameController {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    // constructing full domain model
+    const game: GameVsComputer = {
+      slot,
+      board: makeMoveDto.board,
+      status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
+      winner: null,
+      winningLine: null,
+    };
 
     // check if game is already over before computer move
     const gameStatus = GameLogic.checkGameOver(game.board);
