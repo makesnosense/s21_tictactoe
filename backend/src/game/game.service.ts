@@ -53,7 +53,7 @@ export class GameService {
 
     for (const cell of emptyCells) {
       const boardWithNewMove = structuredClone(game.board);
-      boardWithNewMove[cell.row][cell.col] = CELL.PLAYER_TWO;
+      boardWithNewMove[cell.row][cell.col] = CELL.O;
       const score = this.minMax(boardWithNewMove, false, 0);
       cellsAndScores.push({ cell: cell, score: score });
     }
@@ -70,7 +70,7 @@ export class GameService {
 
     const movesWithScores = emptyCells.map((cell) => {
       const boardWithMove = structuredClone(game.board);
-      boardWithMove[cell.row][cell.col] = CELL.PLAYER_TWO;
+      boardWithMove[cell.row][cell.col] = CELL.O;
       const score = this.minMax(boardWithMove, false, 0);
       return { cell, score };
     });
@@ -114,7 +114,7 @@ export class GameService {
 
       for (const cell of emptyCells) {
         const boardWithNewMove = structuredClone(board);
-        boardWithNewMove[cell.row][cell.col] = CELL.PLAYER_TWO;
+        boardWithNewMove[cell.row][cell.col] = CELL.O;
         const score = this.minMax(boardWithNewMove, false, depth + 1);
         if (score > bestScore) bestScore = score;
       }
@@ -123,7 +123,7 @@ export class GameService {
       bestScore = Infinity;
       for (const cell of emptyCells) {
         const boardWithNewMove = structuredClone(board);
-        boardWithNewMove[cell.row][cell.col] = CELL.PLAYER_ONE;
+        boardWithNewMove[cell.row][cell.col] = CELL.X;
         const score = this.minMax(boardWithNewMove, true, depth + 1);
         if (score < bestScore) bestScore = score;
       }

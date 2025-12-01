@@ -11,7 +11,7 @@ import {
   type GameResult,
   type WinningLine,
   GAME_RESULT,
-  cellValueToGameResult,
+  cellValueToGameVsComputerResult,
 } from '../../../shared/types/game';
 
 export class GameLogic {
@@ -37,8 +37,8 @@ export class GameLogic {
   }
 
   static validateFirstMove(currentBoard: Board): boolean {
-    const playerOneMoves = this.countCellsOfType(currentBoard, CELL.PLAYER_ONE);
-    const playerTwoMoves = this.countCellsOfType(currentBoard, CELL.PLAYER_TWO);
+    const playerOneMoves = this.countCellsOfType(currentBoard, CELL.X);
+    const playerTwoMoves = this.countCellsOfType(currentBoard, CELL.O);
     return playerOneMoves === 1 && playerTwoMoves === 0;
   }
 
@@ -102,7 +102,7 @@ export class GameLogic {
       ) {
         return {
           isOver: true,
-          winner: cellValueToGameResult(board[row][0]),
+          winner: cellValueToGameVsComputerResult(board[row][0]),
           winningLine: { start: { row, col: 0 }, end: { row, col: 2 } },
         };
       }
@@ -117,7 +117,7 @@ export class GameLogic {
       ) {
         return {
           isOver: true,
-          winner: cellValueToGameResult(board[0][col]),
+          winner: cellValueToGameVsComputerResult(board[0][col]),
           winningLine: { start: { row: 0, col }, end: { row: 2, col } },
         };
       }
@@ -131,7 +131,7 @@ export class GameLogic {
     ) {
       return {
         isOver: true,
-        winner: cellValueToGameResult(board[0][0]),
+        winner: cellValueToGameVsComputerResult(board[0][0]),
         winningLine: { start: { row: 0, col: 0 }, end: { row: 2, col: 2 } },
       };
     }
@@ -144,7 +144,7 @@ export class GameLogic {
     ) {
       return {
         isOver: true,
-        winner: cellValueToGameResult(board[0][2]),
+        winner: cellValueToGameVsComputerResult(board[0][2]),
         winningLine: { start: { row: 0, col: 2 }, end: { row: 2, col: 0 } },
       };
     }

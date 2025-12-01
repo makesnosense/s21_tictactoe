@@ -36,7 +36,7 @@ describe('GameService', () => {
   describe('checkGameOver', () => {
     it('detects horizontal win', () => {
       const board: Board = [
-        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.PLAYER_ONE],
+        [CELL.X, CELL.X, CELL.X],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
@@ -53,9 +53,9 @@ describe('GameService', () => {
 
     it('detects vertical win', () => {
       const board: Board = [
-        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
-        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
-        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
+        [CELL.O, CELL.EMPTY, CELL.EMPTY],
+        [CELL.O, CELL.EMPTY, CELL.EMPTY],
+        [CELL.O, CELL.EMPTY, CELL.EMPTY],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -70,9 +70,9 @@ describe('GameService', () => {
 
     it('detects diagonal win (main)', () => {
       const board: Board = [
-        [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
-        [CELL.EMPTY, CELL.PLAYER_ONE, CELL.EMPTY],
-        [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER_ONE],
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.X, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.X],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -87,9 +87,9 @@ describe('GameService', () => {
 
     it('detects diagonal win (anti)', () => {
       const board: Board = [
-        [CELL.EMPTY, CELL.EMPTY, CELL.PLAYER_TWO],
-        [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
-        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.O],
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
+        [CELL.O, CELL.EMPTY, CELL.EMPTY],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -104,9 +104,9 @@ describe('GameService', () => {
 
     it('detects draw', () => {
       const board: Board = [
-        [CELL.PLAYER_ONE, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
-        [CELL.PLAYER_TWO, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
-        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.PLAYER_TWO],
+        [CELL.X, CELL.O, CELL.X],
+        [CELL.O, CELL.O, CELL.X],
+        [CELL.X, CELL.X, CELL.O],
       ];
 
       const result = GameLogic.checkGameOver(board);
@@ -118,8 +118,8 @@ describe('GameService', () => {
 
     it('detects game in progress', () => {
       const board: Board = [
-        [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
-        [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
@@ -135,8 +135,8 @@ describe('GameService', () => {
     it('takes winning move when available', () => {
       // computer can win by placing at [0,2]
       const board: Board = [
-        [CELL.PLAYER_TWO, CELL.PLAYER_TWO, CELL.EMPTY],
-        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
+        [CELL.O, CELL.O, CELL.EMPTY],
+        [CELL.X, CELL.X, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
@@ -156,8 +156,8 @@ describe('GameService', () => {
     it('blocks player from winning', () => {
       // player about to win at [0,2], computer must block
       const board: Board = [
-        [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
-        [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY],
+        [CELL.X, CELL.X, CELL.EMPTY],
+        [CELL.O, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
@@ -176,7 +176,7 @@ describe('GameService', () => {
 
     it('chooses center on empty board or early game', () => {
       const board: Board = [
-        [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
@@ -218,7 +218,7 @@ describe('GameService', () => {
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
       ];
 
-      let currentPlayer: Omit<CellValue, typeof CELL.EMPTY> = CELL.PLAYER_ONE;
+      let currentPlayer: Omit<CellValue, typeof CELL.EMPTY> = CELL.X;
 
       for (let turn = 0; turn < 9; turn++) {
         const gameState = GameLogic.checkGameOver(board);
@@ -234,16 +234,16 @@ describe('GameService', () => {
           winningLine: null,
         };
 
-        if (currentPlayer === CELL.PLAYER_ONE) {
+        if (currentPlayer === CELL.X) {
           // random player move
           const randomCell = service.getRandomComputerMove(game);
-          board[randomCell.row][randomCell.col] = CELL.PLAYER_ONE;
-          currentPlayer = CELL.PLAYER_TWO;
+          board[randomCell.row][randomCell.col] = CELL.X;
+          currentPlayer = CELL.O;
         } else {
           // minimax computer move
           const move = service.getMinMaxedComputerMove(game);
-          board[move.row][move.col] = CELL.PLAYER_TWO;
-          currentPlayer = CELL.PLAYER_ONE;
+          board[move.row][move.col] = CELL.O;
+          currentPlayer = CELL.X;
         }
       }
 
@@ -256,7 +256,7 @@ describe('GameService', () => {
       const game: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
+          [CELL.X, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
@@ -265,7 +265,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateMove(game.board, null, CELL.PLAYER_ONE);
+      const result = GameLogic.validateMove(game.board, null, CELL.X);
 
       expect(result).toBe(true);
     });
@@ -274,7 +274,7 @@ describe('GameService', () => {
       const game: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.EMPTY],
+          [CELL.X, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -282,7 +282,7 @@ describe('GameService', () => {
         winningLine: null,
       };
 
-      const result = GameLogic.validateMove(game.board, null, CELL.PLAYER_ONE);
+      const result = GameLogic.validateMove(game.board, null, CELL.X);
 
       expect(result).toBe(false);
     });
@@ -291,8 +291,8 @@ describe('GameService', () => {
       const previousGame: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+          [CELL.X, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.O, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -303,8 +303,8 @@ describe('GameService', () => {
       const currentGame: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
-          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.PLAYER_ONE],
+          [CELL.X, CELL.X, CELL.EMPTY],
+          [CELL.EMPTY, CELL.O, CELL.X],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -315,7 +315,7 @@ describe('GameService', () => {
       const result = GameLogic.validateMove(
         currentGame.board,
         previousGame.board,
-        CELL.PLAYER_ONE,
+        CELL.X,
       );
 
       expect(result).toBe(false);
@@ -325,8 +325,8 @@ describe('GameService', () => {
       const previousGame: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+          [CELL.X, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.O, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -337,8 +337,8 @@ describe('GameService', () => {
       const currentGame: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_TWO, CELL.EMPTY, CELL.EMPTY], // changed existing cell
-          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+          [CELL.O, CELL.EMPTY, CELL.EMPTY], // changed existing cell
+          [CELL.EMPTY, CELL.O, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -349,7 +349,7 @@ describe('GameService', () => {
       const result = GameLogic.validateMove(
         currentGame.board,
         previousGame.board,
-        CELL.PLAYER_ONE,
+        CELL.X,
       );
 
       expect(result).toBe(false);
@@ -359,8 +359,8 @@ describe('GameService', () => {
       const previousGame: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+          [CELL.X, CELL.EMPTY, CELL.EMPTY],
+          [CELL.EMPTY, CELL.O, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -371,8 +371,8 @@ describe('GameService', () => {
       const currentGame: GameVsComputer = {
         slot: 0,
         board: [
-          [CELL.PLAYER_ONE, CELL.PLAYER_ONE, CELL.EMPTY],
-          [CELL.EMPTY, CELL.PLAYER_TWO, CELL.EMPTY],
+          [CELL.X, CELL.X, CELL.EMPTY],
+          [CELL.EMPTY, CELL.O, CELL.EMPTY],
           [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         ],
         status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
@@ -383,7 +383,7 @@ describe('GameService', () => {
       const result = GameLogic.validateMove(
         currentGame.board,
         previousGame.board,
-        CELL.PLAYER_ONE,
+        CELL.X,
       );
 
       expect(result).toBe(true);

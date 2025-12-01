@@ -2,8 +2,8 @@ import { Circle, X } from "lucide-react";
 import { CELL, type CellValue } from "../../../shared/types/board";
 
 function getCellIcon(cellValue: CellValue) {
-  if (cellValue === CELL.PLAYER_ONE) return <X className="h-8 w-8" />;
-  if (cellValue === CELL.PLAYER_TWO)
+  if (cellValue === CELL.X) return <X className="h-8 w-8" />;
+  if (cellValue === CELL.O)
     return <Circle className="aspect-square h-[22px]" />;
   return null;
 }

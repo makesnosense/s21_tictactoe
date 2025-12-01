@@ -115,7 +115,7 @@ export class GameController {
     const isValid = GameLogic.validateMove(
       makeMoveDto.board,
       existingGame.board,
-      CELL.PLAYER_ONE,
+      CELL.X,
     );
     if (!isValid) {
       throw new HttpException(
@@ -166,7 +166,7 @@ export class GameController {
   private async scheduleComputerMove(game: GameVsComputer): Promise<void> {
     await sleep(COMPUTER_MOVE_DELAY_MS);
     const computerMove = this.gameService.calculateNextComputerMove(game);
-    game.board[computerMove.row][computerMove.col] = CELL.PLAYER_TWO;
+    game.board[computerMove.row][computerMove.col] = CELL.O;
 
     // check if game is over AFTER computer move
     const finalStatus = GameLogic.checkGameOver(game.board);
