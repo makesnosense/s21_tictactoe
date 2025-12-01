@@ -1,0 +1,28 @@
+meta {
+  name: delete
+  type: http
+  seq: 3
+}
+
+delete {
+  url: http://localhost:3000/api/auth/
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: test
+  password: testtest
+}
+
+body:json {
+  {
+    "login": "meow",
+    "password": "meowmeow"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
