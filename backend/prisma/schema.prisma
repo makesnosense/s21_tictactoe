@@ -24,3 +24,20 @@ model Game {
 
   @@map("games_vs_computer")
 }
+
+model GameVsHuman {
+  id              String   @id @default(uuid()) @db.Uuid
+  board           Json
+  status          String
+  playerOneId     String   @db.Uuid
+  playerTwoId     String?  @db.Uuid
+  playerOneSymbol Int
+  playerTwoSymbol Int
+  winner          String?
+  winnerId        String?  @db.Uuid
+  winningLine     Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("games_vs_human")
+}
