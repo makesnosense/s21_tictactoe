@@ -251,70 +251,46 @@ describe('GameService', () => {
     }
   });
 
-  describe('validateBoard', () => {
+  describe('validateMove', () => {
     it('accepts valid first move', () => {
-      const game: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const currentBoard: Board = [
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
-      const result = GameLogic.validateMove(game.board, null, CELL.X);
+      const result = GameLogic.validateMove(currentBoard, null, CELL.X);
 
       expect(result).toBe(true);
     });
 
     it('rejects board with invalid dimensions', () => {
-      const game: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const invalidBoard = [
+        [CELL.X, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY],
+      ] as unknown as Board;
 
-      const result = GameLogic.validateMove(game.board, null, CELL.X);
+      const result = GameLogic.validateMove(invalidBoard, null, CELL.X);
 
       expect(result).toBe(false);
     });
 
     it('rejects multiple moves at once', () => {
-      const previousGame: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.O, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const previousBoard: Board = [
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
-      const currentGame: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.X, CELL.EMPTY],
-          [CELL.EMPTY, CELL.O, CELL.X],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const currentBoard: Board = [
+        [CELL.X, CELL.X, CELL.EMPTY],
+        [CELL.EMPTY, CELL.O, CELL.X],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
       const result = GameLogic.validateMove(
-        currentGame.board,
-        previousGame.board,
+        currentBoard,
+        previousBoard,
         CELL.X,
       );
 
@@ -322,33 +298,21 @@ describe('GameService', () => {
     });
 
     it('rejects changing existing cells', () => {
-      const previousGame: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.O, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const previousBoard: Board = [
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
-      const currentGame: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.O, CELL.EMPTY, CELL.EMPTY], // changed existing cell
-          [CELL.EMPTY, CELL.O, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const currentBoard: Board = [
+        [CELL.O, CELL.EMPTY, CELL.EMPTY], // changed existing cell
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
       const result = GameLogic.validateMove(
-        currentGame.board,
-        previousGame.board,
+        currentBoard,
+        previousBoard,
         CELL.X,
       );
 
@@ -356,33 +320,21 @@ describe('GameService', () => {
     });
 
     it('accepts valid next move', () => {
-      const previousGame: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.EMPTY, CELL.EMPTY],
-          [CELL.EMPTY, CELL.O, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const previousBoard: Board = [
+        [CELL.X, CELL.EMPTY, CELL.EMPTY],
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
-      const currentGame: GameVsComputer = {
-        slot: 0,
-        board: [
-          [CELL.X, CELL.X, CELL.EMPTY],
-          [CELL.EMPTY, CELL.O, CELL.EMPTY],
-          [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
-        ],
-        status: GAME_VS_COMPUTER_STATUS.PLAYER_TURN,
-        winner: null,
-        winningLine: null,
-      };
+      const currentBoard: Board = [
+        [CELL.X, CELL.X, CELL.EMPTY],
+        [CELL.EMPTY, CELL.O, CELL.EMPTY],
+        [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
+      ];
 
       const result = GameLogic.validateMove(
-        currentGame.board,
-        previousGame.board,
+        currentBoard,
+        previousBoard,
         CELL.X,
       );
 
