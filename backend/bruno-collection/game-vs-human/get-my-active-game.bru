@@ -1,0 +1,35 @@
+meta {
+  name: get-my-active-game
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:3000/api/games-vs-human/my/active
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: test
+  password: testtest
+}
+
+body:json {
+  {
+    "login": "meow",
+    "password": "meowmeow"
+  }
+}
+
+script:post-response {
+  const game = res.getBody();
+  if (game) {
+    bru.setVar("gameId", game.id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

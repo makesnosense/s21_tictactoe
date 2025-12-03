@@ -1,0 +1,28 @@
+meta {
+  name: join-game
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/api/games-vs-human/{{gameId}}/join
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: test2
+  password: test2test2
+}
+
+body:json {
+  {
+    "login": "meow",
+    "password": "meowmeow"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

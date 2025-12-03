@@ -1,0 +1,35 @@
+meta {
+  name: available
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/api/games-vs-human/available
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: test
+  password: testtest
+}
+
+body:json {
+  {
+    "login": "meow",
+    "password": "meowmeow"
+  }
+}
+
+script:post-response {
+  const games = res.getBody();
+  if (games && games.length > 0) {
+    bru.setVar("gameId", games[0].id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

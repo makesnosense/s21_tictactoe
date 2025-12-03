@@ -1,0 +1,29 @@
+meta {
+  name: make-second-player-move
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:3000/api/games-vs-human/{{gameId}}/move
+  body: json
+  auth: basic
+}
+
+auth:basic {
+  username: test2
+  password: test2test2
+}
+
+body:json {
+  {
+  "board": [[1,0,0],
+            [0,2,0],
+            [0,0,0]]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

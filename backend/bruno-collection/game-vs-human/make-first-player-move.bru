@@ -1,0 +1,29 @@
+meta {
+  name: make-first-player-move
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:3000/api/games-vs-human/{{gameId}}/move
+  body: json
+  auth: basic
+}
+
+auth:basic {
+  username: test
+  password: testtest
+}
+
+body:json {
+  {
+  "board": [[1,0,0],
+            [0,0,0],
+            [0,0,0]]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
