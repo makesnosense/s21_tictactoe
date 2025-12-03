@@ -1,21 +1,12 @@
 import {
   Controller,
-  Get,
   Post,
-  Delete,
-  Request,
   Body,
   Headers,
-  HttpCode,
-  HttpStatus,
   UnauthorizedException,
-  UseGuards,
-  Param,
-  NotFoundException,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
 import { SignUpRequestDto } from './dtos/signup.dto';
 import { SignUpResponseDto } from './dtos/signup-response.dto';
 import { LoginResponseDto } from './dtos/login-response.dto';
@@ -57,29 +48,5 @@ export class AuthController {
     }
 
     return this.authService.login(username, password);
-  }
-
-  @Delete()
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Request() req: AuthenticatedRequest): Promise<void> {
-    await this.authService.deleteUserById(req.userId);
-  }
-
-  @Get('users/:userId')
-  @UseGuards(AuthGuard)
-  async getUserById(
-    @Param('userId') userId: string,
-  ): Promise<{ id: string; username: string }> {
-    const user = await this.authService.getUserById(userId);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return {
-      id: user.id,
-      username: user.username,
-    };
   }
 }
