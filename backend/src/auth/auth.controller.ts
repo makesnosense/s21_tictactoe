@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   Delete,
   Request,
@@ -9,6 +10,8 @@ import {
   HttpStatus,
   UnauthorizedException,
   UseGuards,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
@@ -61,5 +64,22 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Request() req: AuthenticatedRequest): Promise<void> {
     await this.authService.deleteUserById(req.userId);
+  }
+
+  @Get('users/:userId')
+  @UseGuards(AuthGuard)
+  async getUserById(
+    @Param('userId') userId: string,
+  ): Promise<{ id: string; username: string }> {
+    const user = await this.authService.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+    };
   }
 }

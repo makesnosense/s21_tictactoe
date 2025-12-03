@@ -40,4 +40,19 @@ export class AuthService {
   async deleteUserById(userId: string): Promise<void> {
     await this.userService.deleteById(userId);
   }
+
+  async getUserById(
+    userId: string,
+  ): Promise<{ id: string; username: string } | null> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+    };
+  }
 }
