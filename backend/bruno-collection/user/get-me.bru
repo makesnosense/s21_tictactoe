@@ -1,0 +1,35 @@
+meta {
+  name: get-me
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/api/users/me
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: meow
+  password: meowmeow
+}
+
+body:json {
+  {
+    "login": "meow",
+    "password": "meowmeow"
+  }
+}
+
+script:post-response {
+  const me = res.getBody();
+  if (me ) {
+    bru.setVar("myUserId", me.id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

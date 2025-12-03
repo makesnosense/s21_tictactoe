@@ -1,18 +1,18 @@
 meta {
   name: delete
   type: http
-  seq: 3
+  seq: 1
 }
 
 delete {
-  url: http://localhost:3000/api/auth/
+  url: http://localhost:3000/api/users/me
   body: none
   auth: basic
 }
 
 auth:basic {
-  username: test
-  password: testtest
+  username: meow
+  password: meowmeow
 }
 
 body:json {
