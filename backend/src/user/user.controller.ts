@@ -21,7 +21,7 @@ export class UserController {
   async getMe(
     @Request() req: AuthenticatedRequest,
   ): Promise<{ id: string; username: string }> {
-    return await this.userService.findById(req.userId);
+    return await this.userService.findByIdPublic(req.userId);
   }
 
   @Delete('me')
@@ -34,6 +34,6 @@ export class UserController {
   async getUserById(
     @Param('userId') userId: string,
   ): Promise<{ id: string; username: string }> {
-    return await this.userService.findById(userId);
+    return await this.userService.findByIdPublic(userId);
   }
 }

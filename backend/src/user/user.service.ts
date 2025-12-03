@@ -54,6 +54,14 @@ export class UserService {
     return user;
   }
 
+  async findByIdPublic(id: string): Promise<Omit<User, 'password'>> {
+    const user = await this.findById(id);
+    return {
+      id: user.id,
+      username: user.username,
+    };
+  }
+
   async validatePassword(
     plainPassword: string,
     hashedPassword: string,
