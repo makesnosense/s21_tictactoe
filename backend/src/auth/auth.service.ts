@@ -32,11 +32,6 @@ export class AuthService {
     return { userId: user.id };
   }
 
-  async validateUserById(userId: string): Promise<boolean> {
-    const user = await this.userService.findById(userId);
-    return !!user;
-  }
-
   async deleteUserById(userId: string): Promise<void> {
     await this.userService.deleteById(userId);
   }
