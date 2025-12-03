@@ -4,7 +4,7 @@ import { WinningLine, GameResult } from "./game";
 import { CellValue } from "./board";
 
 export const GAME_VS_HUMAN_STATUS = {
-  WAITING_FOR_PLAYER: "waiting_for_player",
+  WAITING_FOR_OPPONENT: "waiting_for_opponent",
   PLAYER_ONE_TURN: "player_one_turn",
   PLAYER_TWO_TURN: "player_two_turn",
   FINISHED: "finished",

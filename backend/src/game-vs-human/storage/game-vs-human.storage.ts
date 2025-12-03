@@ -7,6 +7,6 @@ export abstract class GameVsHumanStorage {
   abstract findById(id: string): Promise<GameVsHuman | null>;
   abstract update(id: string, data: Partial<GameVsHuman>): Promise<GameVsHuman>;
   abstract delete(id: string): Promise<boolean>;
-  abstract findWaitingGames(): Promise<GameVsHuman[]>;
+  abstract findAvailableGames(): Promise<GameVsHuman[]>;
   abstract findActiveGameByUserId(userId: string): Promise<GameVsHuman | null>;
 }

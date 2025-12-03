@@ -4,7 +4,7 @@ import { ObjectValues } from "./utils";
 export const GAME_RESULT = {
   IN_PROGRESS: null,
   DRAW: "draw",
-  PLAYER_ONE_WINS: "player wins",
+  PLAYER_ONE_WINS: "player one wins",
   PLAYER_TWO_WINS: "player two wins",
 } as const;
 

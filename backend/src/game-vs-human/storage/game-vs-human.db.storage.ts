@@ -47,9 +47,9 @@ export class GameVsHumanDbStorage extends GameVsHumanStorage {
     }
   }
 
-  async findWaitingGames(): Promise<DomainGameVsHuman[]> {
+  async findAvailableGames(): Promise<DomainGameVsHuman[]> {
     const games = await this.prisma.gameVsHuman.findMany({
-      where: { status: GAME_VS_HUMAN_STATUS.WAITING_FOR_PLAYER },
+      where: { status: GAME_VS_HUMAN_STATUS.WAITING_FOR_OPPONENT },
       orderBy: { createdAt: 'desc' },
     });
     return games.map((game) => GameVsHumanMapper.toDomain(game));
