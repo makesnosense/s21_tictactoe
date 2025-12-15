@@ -27,6 +27,11 @@ services:
       dockerfile: frontend/Dockerfile
     container_name: tictactoe-frontend
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m" 
+        max-file: "5"
     ports:
       - "127.0.0.1:3001:3001"
     depends_on:
