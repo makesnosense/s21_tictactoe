@@ -74,6 +74,10 @@ export function GamesClient({ initialGames }: GamesClientProps) {
       };
 
       eventSource.onerror = (error) => {
+        // eventSource.close() sets EventSource.CLOSED, means intentional cleanup, so no error
+        if (eventSource?.readyState === EventSource.CLOSED) {
+          return;
+        }
         console.error("SSE error:", error);
         eventSource?.close();
         hadError = true;
