@@ -8,7 +8,7 @@ COPY shared/ ./shared/
 # copy frontend files
 COPY frontend/package*.json ./frontend/
 COPY frontend/tsconfig.json ./frontend/
-COPY frontend/next.config.ts ./frontend/
+COPY frontend/next.config.mjs ./frontend/
 COPY frontend/postcss.config.mjs ./frontend/
 COPY frontend/src/ ./frontend/src/
 COPY frontend/public/ ./frontend/public/
@@ -29,7 +29,7 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY --from=builder /app/frontend/.next ./.next
 COPY --from=builder /app/frontend/public ./public
 COPY --from=builder /app/frontend/package*.json ./
-COPY --from=builder /app/frontend/next.config.ts ./
+COPY --from=builder /app/frontend/next.config.mjs ./
 
 RUN npm ci --only=production
 
