@@ -8,11 +8,13 @@ interface WinningLineProps {
 export function WinningLine({ line }: WinningLineProps) {
   const CELL_SIZE = 40;
   const GAP = 1;
+  const PADDING = 1;
   const GRID_TOTAL = CELL_SIZE * 3 + GAP * 2; // 122
+  const ACTUAL_CELL_SIZE = (GRID_TOTAL - PADDING * 2 - GAP * 2) / 3; // 39.33px
 
   const getCellCenterCoordinates = (pos: { row: number; col: number }) => ({
-    x: pos.col * (CELL_SIZE + GAP) + CELL_SIZE / 2,
-    y: pos.row * (CELL_SIZE + GAP) + CELL_SIZE / 2,
+    x: PADDING + pos.col * (ACTUAL_CELL_SIZE + GAP) + ACTUAL_CELL_SIZE / 2,
+    y: PADDING + pos.row * (ACTUAL_CELL_SIZE + GAP) + ACTUAL_CELL_SIZE / 2,
   });
 
   const start = getCellCenterCoordinates(line.start);
