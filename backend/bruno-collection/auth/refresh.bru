@@ -1,18 +1,17 @@
 meta {
-  name: login
+  name: refresh
   type: http
-  seq: 2
+  seq: 3
 }
 
 post {
-  url: http://localhost:3000/api/auth/login
+  url: http://localhost:3000/api/auth/refresh
   body: json
 }
 
 body:json {
   {
-    "login": "meow",
-    "password": "meowmeow"
+    "refreshToken": "{{refreshToken}}"
   }
 }
 
