@@ -7,12 +7,11 @@ meta {
 delete {
   url: http://localhost:3000/api/users/me
   body: none
-  auth: basic
+  auth: bearer
 }
 
-auth:basic {
-  username: meow
-  password: meowmeow
+auth:bearer {
+  token: {{accessToken}}
 }
 
 body:json {

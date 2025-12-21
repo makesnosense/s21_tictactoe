@@ -7,12 +7,11 @@ meta {
 post {
   url: http://localhost:3000/api/games-vs-human/{{gameId}}/join
   body: none
-  auth: basic
+  auth: bearer
 }
 
-auth:basic {
-  username: test2
-  password: test2test2
+auth:bearer {
+  token: {{accessToken}}
 }
 
 body:json {

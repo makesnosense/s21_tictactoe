@@ -4,41 +4,36 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+
 import { Request as ExpressRequest } from 'express';
 import { AuthenticatedRequest } from './auth.controller';
+import { JwtService } from '@nestjs/jwt';
+import { ACCESS_TOKEN_SECRET } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly jwtService: JwtService) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request: ExpressRequest = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
 
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
-      throw new UnauthorizedException(
-        'Missing or invalid Authorization header',
-      );
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Missing or invalid token');
     }
 
-    const base64Credentials = authHeader.slice('Basic '.length);
-    const credentials = Buffer.from(base64Credentials, 'base64').toString(
-      'utf-8',
-    );
-
-    const [username, password] = credentials.split(':');
-
-    if (!username || !password) {
-      throw new UnauthorizedException('Invalid credentials format');
-    }
+    const refreshToken = authHeader.slice('Bearer '.length);
 
     try {
-      const { userId } = await this.authService.login(username, password);
-      (request as AuthenticatedRequest).userId = userId; // store userId in request object
+      const extractedPayload: { sub: string; jti: string } =
+        this.jwtService.verify(refreshToken, {
+          secret: ACCESS_TOKEN_SECRET,
+        });
+
+      (request as AuthenticatedRequest).userId = extractedPayload.sub;
       return true;
     } catch {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

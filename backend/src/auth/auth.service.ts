@@ -9,7 +9,7 @@ import { SignUpRequestDto } from './dtos/signup.dto';
 import { SignUpResponseDto } from './dtos/signup-response.dto';
 import type { JwtResponseDto } from './dtos/jwt-response.dto';
 
-const ACCESS_TOKEN_SECRET =
+export const ACCESS_TOKEN_SECRET =
   process.env.JWT_ACCESS_SECRET || 'access-secret-change-me';
 const REFRESH_TOKEN_SECRET =
   process.env.JWT_REFRESH_SECRET || 'refresh-secret-change-me';

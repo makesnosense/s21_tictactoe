@@ -8,6 +8,6 @@ import { UserModule } from 'src/user/user.module';
   imports: [forwardRef(() => UserModule), JwtModule.register({})],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
