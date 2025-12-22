@@ -1,0 +1,31 @@
+meta {
+  name: login-second-player
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "login": "test2",
+    "password": "test2test2"
+  }
+}
+
+script:post-response {
+  const response = res.getBody();
+  if (response && response.accessToken) {
+    bru.setVar("accessToken2", response.accessToken);
+    bru.setVar("refreshToken2", response.refreshToken);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

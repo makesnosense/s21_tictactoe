@@ -1,24 +1,23 @@
 meta {
-  name: make-second-player-move
+  name: make-move-first-player
   type: http
-  seq: 9
+  seq: 6
 }
 
 post {
   url: http://localhost:3000/api/games-vs-human/{{gameId}}/move
   body: json
-  auth: basic
+  auth: bearer
 }
 
-auth:basic {
-  username: test2
-  password: test2test2
+auth:bearer {
+  token: {{accessToken}}
 }
 
 body:json {
   {
   "board": [[1,0,0],
-            [0,2,0],
+            [0,0,0],
             [0,0,0]]
   }
 }
