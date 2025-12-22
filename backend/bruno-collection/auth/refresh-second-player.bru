@@ -1,0 +1,30 @@
+meta {
+  name: refresh-second-player
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:3000/api/auth/refresh
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "refreshToken": "{{refreshToken2}}"
+  }
+}
+
+script:post-response {
+  const response = res.getBody();
+  if (response && response.accessToken) {
+    bru.setVar("accessToken2", response.accessToken);
+    bru.setVar("refreshToken2", response.refreshToken);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

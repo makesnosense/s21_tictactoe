@@ -37,6 +37,13 @@ export class GameVsHumanController {
     return this.gameService.getActiveGameByUserId(req.user.userId);
   }
 
+  @Get('my-history')
+  async getMyGameHistory(
+    @Request() req: AccessAuthenticatedRequest,
+  ): Promise<GameVsHuman[]> {
+    return this.gameService.getCompletedGamesByUserId(req.user.userId);
+  }
+
   @Post(':gameId/join')
   async joinGame(
     @Param('gameId') gameId: string,

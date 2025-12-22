@@ -181,4 +181,9 @@ export class GameVsHumanService {
   async getActiveGameByUserId(userId: string): Promise<GameVsHuman | null> {
     return this.storage.findActiveGameByUserId(userId);
   }
+
+  async getCompletedGamesByUserId(userId: string): Promise<GameVsHuman[]> {
+    const games = await this.storage.findCompletedGamesByUserId(userId);
+    return games;
+  }
 }

@@ -9,4 +9,5 @@ export abstract class GameVsHumanStorage {
   abstract delete(id: string): Promise<boolean>;
   abstract findAvailableGames(): Promise<GameVsHuman[]>;
   abstract findActiveGameByUserId(userId: string): Promise<GameVsHuman | null>;
+  abstract findCompletedGamesByUserId(userId: string): Promise<GameVsHuman[]>;
 }

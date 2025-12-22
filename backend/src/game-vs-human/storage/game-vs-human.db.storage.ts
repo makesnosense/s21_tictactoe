@@ -66,4 +66,20 @@ export class GameVsHumanDbStorage extends GameVsHumanStorage {
     });
     return result ? GameVsHumanMapper.toDomain(result) : null;
   }
+
+  async findCompletedGamesByUserId(
+    userId: string,
+  ): Promise<DomainGameVsHuman[]> {
+    const games = await this.prisma.gameVsHuman.findMany({
+      where: {
+        status: GAME_VS_HUMAN_STATUS.FINISHED,
+        OR: [
+          { playerOneId: userId, winner: { not: null } },
+          { playerTwoId: userId, winner: { not: null } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return games.map((game) => GameVsHumanMapper.toDomain(game));
+  }
 }
