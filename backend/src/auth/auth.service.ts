@@ -11,7 +11,7 @@ import type { JwtResponseDto } from './dtos/jwt-response.dto';
 
 export const ACCESS_TOKEN_SECRET =
   process.env.JWT_ACCESS_SECRET || 'access-secret-change-me';
-const REFRESH_TOKEN_SECRET =
+export const REFRESH_TOKEN_SECRET =
   process.env.JWT_REFRESH_SECRET || 'refresh-secret-change-me';
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '14d';
@@ -77,30 +77,16 @@ export class AuthService {
     };
   }
 
-  async refresh(existingRefreshToken: string): Promise<JwtResponseDto> {
-    let extractedPayload: { sub: string; jti: string };
-    try {
-      extractedPayload = this.jwtService.verify(existingRefreshToken, {
-        secret: REFRESH_TOKEN_SECRET,
-      });
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    const tokenRecordInDb = await this.prisma.refreshToken.findUnique({
-      where: { jti: extractedPayload.jti },
-    });
-
-    if (!tokenRecordInDb || tokenRecordInDb.expiresAt < new Date()) {
-      throw new UnauthorizedException('Refresh token expired or revoked');
-    }
-
-    // invalidate existing refresh token (delete by jti)
+  async refreshFromValidatedToken(
+    userId: string,
+    jti: string,
+  ): Promise<JwtResponseDto> {
+    // strategy has already validated the token and checked database
+    // we just need to invalidate old token and generate new ones
     await this.prisma.refreshToken.delete({
-      where: { jti: extractedPayload.jti },
+      where: { jti },
     });
-
-    return this.generateTokens(extractedPayload.sub);
+    return this.generateTokens(userId);
   }
 
   async deleteUserById(userId: string): Promise<void> {

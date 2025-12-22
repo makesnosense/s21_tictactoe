@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Headers } from '@nestjs/common';
+import { Controller, Post, Body, Request, UseGuards } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
 import { SignUpRequestDto } from './dtos/signup.dto';
@@ -6,9 +6,14 @@ import { SignUpResponseDto } from './dtos/signup-response.dto';
 import { JwtRequestDto } from './dtos/jwt-request.dto';
 import { JwtResponseDto } from './dtos/jwt-response.dto';
 import { RefreshJwtRequestDto } from './dtos/refresh-jwt-request.dto';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
 
-export interface AuthenticatedRequest extends ExpressRequest {
-  userId: string;
+export interface AccessAuthenticatedRequest extends ExpressRequest {
+  user: { userId: string };
+}
+
+export interface RefreshAuthenticatedRequest extends ExpressRequest {
+  user: { userId: string; jti: string };
 }
 
 @Controller('auth')
@@ -26,7 +31,15 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() dto: RefreshJwtRequestDto): Promise<JwtResponseDto> {
-    return this.authService.refresh(dto.refreshToken);
+  @UseGuards(RefreshTokenGuard)
+  async refresh(
+    @Request() req: RefreshAuthenticatedRequest,
+    @Body() _dto: RefreshJwtRequestDto, // required by task, validated by guard
+  ): Promise<JwtResponseDto> {
+    // passport has validated the refresh token and attached user to request
+    return this.authService.refreshFromValidatedToken(
+      req.user.userId,
+      req.user.jti,
+    );
   }
 }
