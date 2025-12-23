@@ -6,7 +6,6 @@ import { GameStorage } from './storage/game.storage';
 import { type Board, type CellValue, CELL } from '../../../shared/types/board';
 import {
   type GameVsComputer,
-  GAME_RESULT,
   GAME_VS_COMPUTER_STATUS,
 } from '../../../shared/types/game';
 
@@ -44,7 +43,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.PLAYER_ONE_WINS);
+      expect(result.winningCellValue).toBe(CELL.X);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 0 },
         end: { row: 0, col: 2 },
@@ -61,7 +60,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.PLAYER_TWO_WINS);
+      expect(result.winningCellValue).toBe(CELL.O);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 0 },
         end: { row: 2, col: 0 },
@@ -78,7 +77,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.PLAYER_ONE_WINS);
+      expect(result.winningCellValue).toBe(CELL.X);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 0 },
         end: { row: 2, col: 2 },
@@ -95,7 +94,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.PLAYER_TWO_WINS);
+      expect(result.winningCellValue).toBe(CELL.O);
       expect(result.winningLine).toEqual({
         start: { row: 0, col: 2 },
         end: { row: 2, col: 0 },
@@ -112,7 +111,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(true);
-      expect(result.winner).toBe(GAME_RESULT.DRAW);
+      expect(result.winningCellValue).toBe('draw');
       expect(result.winningLine).toBeNull();
     });
 
@@ -126,7 +125,7 @@ describe('GameService', () => {
       const result = GameLogic.checkGameOver(board);
 
       expect(result.isOver).toBe(false);
-      expect(result.winner).toBe(GAME_RESULT.IN_PROGRESS);
+      expect(result.winningCellValue).toBe(null);
       expect(result.winningLine).toBeNull();
     });
   });
@@ -202,7 +201,7 @@ describe('GameService', () => {
 
       for (let i = 0; i < testGames; i++) {
         const result = playFullGame();
-        if (result === GAME_RESULT.PLAYER_ONE_WINS) {
+        if (result === CELL.X) {
           losses++;
         }
       }
@@ -211,7 +210,7 @@ describe('GameService', () => {
     });
 
     // helper function to simulate a full game
-    function playFullGame(): string | null {
+    function playFullGame(): CellValue | 'draw' | null {
       const board: Board = [
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
         [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY],
@@ -223,7 +222,7 @@ describe('GameService', () => {
       for (let turn = 0; turn < 9; turn++) {
         const gameState = GameLogic.checkGameOver(board);
         if (gameState.isOver) {
-          return gameState.winner;
+          return gameState.winningCellValue;
         }
 
         const game: GameVsComputer = {
@@ -247,7 +246,7 @@ describe('GameService', () => {
         }
       }
 
-      return GameLogic.checkGameOver(board).winner;
+      return GameLogic.checkGameOver(board).winningCellValue;
     }
   });
 

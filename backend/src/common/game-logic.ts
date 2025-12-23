@@ -8,10 +8,7 @@ import {
 
 import {
   // type Game,
-  type GameResult,
   type WinningLine,
-  GAME_RESULT,
-  cellValueToGameVsComputerResult,
 } from '../../../shared/types/game';
 
 export class GameLogic {
@@ -90,7 +87,7 @@ export class GameLogic {
 
   static checkGameOver(board: Board): {
     isOver: boolean;
-    winner: GameResult;
+    winningCellValue: CellValue | 'draw' | null;
     winningLine: WinningLine | null;
   } {
     // check rows
@@ -102,7 +99,7 @@ export class GameLogic {
       ) {
         return {
           isOver: true,
-          winner: cellValueToGameVsComputerResult(board[row][0]),
+          winningCellValue: board[row][0],
           winningLine: { start: { row, col: 0 }, end: { row, col: 2 } },
         };
       }
@@ -117,7 +114,7 @@ export class GameLogic {
       ) {
         return {
           isOver: true,
-          winner: cellValueToGameVsComputerResult(board[0][col]),
+          winningCellValue: board[0][col],
           winningLine: { start: { row: 0, col }, end: { row: 2, col } },
         };
       }
@@ -131,7 +128,7 @@ export class GameLogic {
     ) {
       return {
         isOver: true,
-        winner: cellValueToGameVsComputerResult(board[0][0]),
+        winningCellValue: board[0][0],
         winningLine: { start: { row: 0, col: 0 }, end: { row: 2, col: 2 } },
       };
     }
@@ -144,7 +141,7 @@ export class GameLogic {
     ) {
       return {
         isOver: true,
-        winner: cellValueToGameVsComputerResult(board[0][2]),
+        winningCellValue: board[0][2],
         winningLine: { start: { row: 0, col: 2 }, end: { row: 2, col: 0 } },
       };
     }
@@ -152,12 +149,12 @@ export class GameLogic {
     const boardIsFull = this.getEmptyCells(board).length === 0;
 
     if (boardIsFull) {
-      return { isOver: true, winner: GAME_RESULT.DRAW, winningLine: null };
+      return { isOver: true, winningCellValue: 'draw', winningLine: null };
     }
 
     return {
       isOver: false,
-      winner: GAME_RESULT.IN_PROGRESS,
+      winningCellValue: null,
       winningLine: null,
     };
   }

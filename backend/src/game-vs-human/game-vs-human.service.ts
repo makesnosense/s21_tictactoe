@@ -6,12 +6,16 @@ import {
 } from '@nestjs/common';
 import { GameVsHumanStorage } from './storage/game-vs-human.storage';
 import { GameLogic } from 'src/common/game-logic';
-import { CELL, createEmptyBoard } from '../../../shared/types/board';
+import {
+  CELL,
+  createEmptyBoard,
+  type CellValue,
+} from '../../../shared/types/board';
 import {
   GAME_VS_HUMAN_STATUS,
   type GameVsHuman,
 } from '../../../shared/types/game-vs-human';
-import { GAME_RESULT } from '../../../shared/types/game';
+import { GAME_RESULT, type GameResult } from '../../../shared/types/game';
 
 @Injectable()
 export class GameVsHumanService {
@@ -136,20 +140,15 @@ export class GameVsHumanService {
     let updatedGame: GameVsHuman;
 
     if (gameStatus.isOver) {
-      // determine winner
-      let winnerId: string | null = null;
-      if (gameStatus.winner === GAME_RESULT.PLAYER_ONE_WINS) {
-        winnerId =
-          game.playerOneSymbol === CELL.X ? game.playerOneId : game.playerTwoId;
-      } else if (gameStatus.winner === GAME_RESULT.PLAYER_TWO_WINS) {
-        winnerId =
-          game.playerTwoSymbol === CELL.O ? game.playerTwoId : game.playerOneId;
-      }
+      const { winnerId, winner } = GameVsHumanService.determineWinner(
+        gameStatus.winningCellValue,
+        game,
+      );
 
       updatedGame = await this.storage.update(gameId, {
         board,
         status: GAME_VS_HUMAN_STATUS.FINISHED,
-        winner: gameStatus.winner,
+        winner,
         winnerId,
         winningLine: gameStatus.winningLine,
       });
@@ -166,6 +165,32 @@ export class GameVsHumanService {
     }
 
     return updatedGame;
+  }
+
+  static determineWinner(
+    winningCellValue: CellValue | 'draw' | null,
+    game: GameVsHuman,
+  ): { winnerId: string | null; winner: GameResult } {
+    if (winningCellValue === 'draw') {
+      return { winnerId: null, winner: GAME_RESULT.DRAW };
+    }
+
+    if (winningCellValue === null) {
+      return { winnerId: null, winner: GAME_RESULT.IN_PROGRESS };
+    }
+
+    if (winningCellValue === game.playerOneSymbol) {
+      return {
+        winnerId: game.playerOneId,
+        winner: GAME_RESULT.PLAYER_ONE_WINS,
+      };
+    }
+
+    // must be playerTwoSymbol
+    return {
+      winnerId: game.playerTwoId,
+      winner: GAME_RESULT.PLAYER_TWO_WINS,
+    };
   }
 
   async getGame(gameId: string): Promise<GameVsHuman> {

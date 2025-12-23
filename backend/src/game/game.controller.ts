@@ -137,7 +137,10 @@ export class GameController {
     const gameStatus = GameLogic.checkGameOver(game.board);
     if (gameStatus.isOver) {
       game.status = GAME_VS_COMPUTER_STATUS.FINISHED;
-      game.winner = gameStatus.winner;
+      game.winner = GameService.winningCellValueToGameVsComputerResult(
+        gameStatus.winningCellValue,
+      );
+      // game.winner = gameStatus.winner;
       game.winningLine = gameStatus.winningLine;
       await this.gameStorage.save(game);
 
@@ -174,7 +177,9 @@ export class GameController {
     game.status = finalStatus.isOver
       ? GAME_VS_COMPUTER_STATUS.FINISHED
       : GAME_VS_COMPUTER_STATUS.PLAYER_TURN;
-    game.winner = finalStatus.winner;
+    game.winner = GameService.winningCellValueToGameVsComputerResult(
+      finalStatus.winningCellValue,
+    );
     game.winningLine = finalStatus.winningLine;
 
     // save updated game state

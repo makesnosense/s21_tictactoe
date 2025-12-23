@@ -6,14 +6,13 @@ import {
   CELL,
   // BOARD_SIZE,
   MoveCoordinates,
+  type CellValue,
 } from '../../../shared/types/board';
 
 import {
-  type GameVsComputer,
-  // type GameResult,
-  // type WinningLine,
   GAME_RESULT,
-  // cellValueToGameResult,
+  type GameVsComputer,
+  type GameResult,
 } from '../../../shared/types/game';
 
 // higher temperature = more random, lower = more deterministic
@@ -95,10 +94,8 @@ export class GameService {
   minMax(board: Board, isMaximizing: boolean, depth: number): number {
     const currentResult = GameLogic.checkGameOver(board);
     if (currentResult.isOver) {
-      if (currentResult.winner === GAME_RESULT.PLAYER_ONE_WINS)
-        return -10 + depth;
-      else if (currentResult.winner === GAME_RESULT.PLAYER_TWO_WINS)
-        return 10 - depth;
+      if (currentResult.winningCellValue === CELL.X) return -10 + depth;
+      else if (currentResult.winningCellValue === CELL.O) return 10 - depth;
       else {
         return 0;
       }
@@ -129,5 +126,20 @@ export class GameService {
       }
     }
     return bestScore;
+  }
+
+  static winningCellValueToGameVsComputerResult(
+    winningCellValue: CellValue | 'draw' | null,
+  ): GameResult {
+    switch (winningCellValue) {
+      case CELL.X:
+        return GAME_RESULT.PLAYER_ONE_WINS;
+      case CELL.O:
+        return GAME_RESULT.PLAYER_TWO_WINS;
+      case 'draw':
+        return GAME_RESULT.DRAW;
+      default:
+        return GAME_RESULT.IN_PROGRESS;
+    }
   }
 }
