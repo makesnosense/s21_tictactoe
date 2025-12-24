@@ -16,6 +16,7 @@ import {
   type GameVsHuman,
 } from '../../../shared/types/game-vs-human';
 import { GAME_RESULT, type GameResult } from '../../../shared/types/game';
+import type { LeaderboardEntryDto } from './dtos/leaderboard.dto';
 
 @Injectable()
 export class GameVsHumanService {
@@ -210,5 +211,9 @@ export class GameVsHumanService {
   async getCompletedGamesByUserId(userId: string): Promise<GameVsHuman[]> {
     const games = await this.storage.findCompletedGamesByUserId(userId);
     return games;
+  }
+
+  async getLeaderboard(limit?: number): Promise<LeaderboardEntryDto[]> {
+    return this.storage.getLeaderboard(limit);
   }
 }

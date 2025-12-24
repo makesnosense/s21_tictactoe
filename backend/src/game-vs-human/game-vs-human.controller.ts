@@ -6,12 +6,15 @@ import {
   Param,
   Request,
   UseGuards,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { GameVsHumanService } from './game-vs-human.service';
 import { AccessAuthenticatedRequest } from 'src/auth/auth.controller';
 import { MakeMoveVsHumanDto } from './dtos/make-move-vs-human.dto';
 import type { GameVsHuman } from '../../../shared/types/game-vs-human';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import type { LeaderboardEntryDto } from './dtos/leaderboard.dto';
 
 @Controller('games-vs-human')
 @UseGuards(AccessTokenGuard)
@@ -42,6 +45,14 @@ export class GameVsHumanController {
     @Request() req: AccessAuthenticatedRequest,
   ): Promise<GameVsHuman[]> {
     return this.gameService.getCompletedGamesByUserId(req.user.userId);
+  }
+
+  @Get('leaderboard')
+  async getLeaderboard(
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+  ): Promise<LeaderboardEntryDto[]> {
+    const actualLimit = limit && limit > 0 ? limit : undefined;
+    return this.gameService.getLeaderboard(actualLimit);
   }
 
   @Post(':gameId/join')

@@ -1,4 +1,5 @@
 import { GameVsHuman } from '../../../../shared/types/game-vs-human';
+import type { LeaderboardEntryDto } from '../dtos/leaderboard.dto';
 
 export abstract class GameVsHumanStorage {
   abstract create(
@@ -10,4 +11,5 @@ export abstract class GameVsHumanStorage {
   abstract findAvailableGames(): Promise<GameVsHuman[]>;
   abstract findActiveGameByUserId(userId: string): Promise<GameVsHuman | null>;
   abstract findCompletedGamesByUserId(userId: string): Promise<GameVsHuman[]>;
+  abstract getLeaderboard(limit?: number): Promise<LeaderboardEntryDto[]>;
 }

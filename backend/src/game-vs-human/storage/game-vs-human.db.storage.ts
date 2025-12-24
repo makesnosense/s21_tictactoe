@@ -6,6 +6,8 @@ import {
   GAME_VS_HUMAN_STATUS,
   type GameVsHuman as DomainGameVsHuman,
 } from '../../../../shared/types/game-vs-human';
+import { LeaderboardEntryDto } from '../dtos/leaderboard.dto';
+import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class GameVsHumanDbStorage extends GameVsHumanStorage {
@@ -81,5 +83,62 @@ export class GameVsHumanDbStorage extends GameVsHumanStorage {
       orderBy: { createdAt: 'desc' },
     });
     return games.map((game) => GameVsHumanMapper.toDomain(game));
+  }
+
+  async getLeaderboard(limit: number): Promise<LeaderboardEntryDto[]> {
+    const results = await this.prisma.$queryRaw<
+      {
+        id: string;
+        username: string;
+        ratio: number;
+      }[]
+    >`
+     WITH users_who_played AS (
+             SELECT "playerOneId" AS id
+               FROM games_vs_human
+              WHERE status = ${GAME_VS_HUMAN_STATUS.FINISHED}
+              UNION
+             SELECT "playerTwoId" AS id
+               FROM games_vs_human
+              WHERE status = ${GAME_VS_HUMAN_STATUS.FINISHED}
+          ),
+          total_games_by_user AS (
+             SELECT users_who_played.id,
+                    COUNT(*) AS totalGames
+               FROM users_who_played
+              INNER JOIN games_vs_human ON (
+                    users_who_played.id = games_vs_human."playerOneId"
+                 OR users_who_played.id = games_vs_human."playerTwoId"
+                    )
+              WHERE games_vs_human.status = ${GAME_VS_HUMAN_STATUS.FINISHED}
+           GROUP BY users_who_played.id
+          ),
+          games_won_by_user AS (
+             SELECT users_who_played.id,
+                    COUNT(*) AS gamesWon
+               FROM users_who_played
+              INNER JOIN games_vs_human ON (
+                    users_who_played.id = games_vs_human."playerOneId"
+                 OR users_who_played.id = games_vs_human."playerTwoId"
+                    )
+              WHERE users_who_played.id = games_vs_human."winnerId"
+                AND games_vs_human.status = ${GAME_VS_HUMAN_STATUS.FINISHED}
+           GROUP BY users_who_played.id
+          )
+   SELECT total_games_by_user.id,
+          users.username,
+          ROUND((COALESCE(gamesWon, 0)::FLOAT / totalGames::FLOAT)::NUMERIC, 2) AS ratio
+     FROM total_games_by_user
+LEFT JOIN games_won_by_user ON total_games_by_user.id = games_won_by_user.id
+LEFT JOIN users ON total_games_by_user.id = users.id
+ ORDER BY ratio DESC
+${limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty}
+  `;
+
+    return results.map((row) => ({
+      userId: row.id,
+      username: row.username,
+      winRatio: Number(row.ratio),
+    }));
   }
 }
